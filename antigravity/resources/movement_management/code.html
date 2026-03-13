@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gestión de Ingresos y Egresos</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1152d4",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hidden md:flex flex-col">
+<div class="p-6 flex items-center gap-3">
+<div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+</div>
+<div>
+<h1 class="text-sm font-bold tracking-tight">SaaS Financiero</h1>
+<p class="text-[10px] text-slate-500 font-medium uppercase tracking-wider">Gestión de Ingresos</p>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+                    Dashboard
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium bg-primary/10 text-primary rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">swap_horiz</span>
+                    Movimientos
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">bar_chart</span>
+                    Reportes
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">account_balance</span>
+                    Presupuesto
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+                    Configuración
+                </a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3 p-2">
+<div class="size-9 rounded-full bg-slate-200 dark:bg-slate-700 bg-cover bg-center" data-alt="User profile avatar circle" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCo8CFrDLaOuUfZGhT6YYwm7VYDCX54GU-1Yo4OYSgGGP-Z6iOpPXLStnNKSsc3le1HS0PxFIoVH2u8w4ON7iRJ5VaM7KZ6QGQYVg-HqdaWM6oUHhTCnK61_8n5KBBokb5hxaT4i_Rwg-H17epbU3UTccoXyGlGriW-bpzVhtDSseICz7hMrI8Zbqzy6UolAsBBjzDAY4PpzzHHrVnx9xrJRppeRMXBxkRhS5r0JtF2HxF8lsnMayjDI2Ui1ic0TjGm3uGGlm5uKefc')"></div>
+<div class="flex-1 overflow-hidden">
+<p class="text-xs font-bold truncate">Carlos Méndez</p>
+<p class="text-[10px] text-slate-500 truncate">carlos@empresa.com</p>
+</div>
+<span class="material-symbols-outlined text-slate-400 text-sm">unfold_more</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-background-light dark:bg-background-dark">
+<!-- Header -->
+<header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md flex items-center justify-between px-8 z-10">
+<div class="flex items-center gap-4">
+<button class="md:hidden p-2 text-slate-600">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h2 class="text-sm font-semibold text-slate-700 dark:text-slate-200">Gestión de Ingresos y Egresos</h2>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+<input class="pl-9 pr-4 py-1.5 bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm w-64 focus:ring-2 focus:ring-primary/20 placeholder:text-slate-500" placeholder="Buscar movimientos..." type="text"/>
+</div>
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg relative">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
+</button>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="flex-1 overflow-y-auto p-8">
+<div class="max-w-6xl mx-auto space-y-8">
+<!-- Page Title & CTA -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div>
+<h1 class="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Movimientos Financieros</h1>
+<p class="text-slate-500 mt-1">Administra tus flujos de caja de forma eficiente.</p>
+</div>
+<button class="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-lg font-bold text-sm transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+                            Nuevo Movimiento
+                        </button>
+</div>
+<!-- Summary Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Ingresos</span>
+<div class="size-8 bg-green-100 dark:bg-green-900/30 text-green-600 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">trending_up</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-black">$12,450.00</span>
+<span class="text-xs font-bold text-green-600">+12%</span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Egresos</span>
+<div class="size-8 bg-red-100 dark:bg-red-900/30 text-red-600 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">trending_down</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-black">$8,200.00</span>
+<span class="text-xs font-bold text-red-600">-5%</span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Balance Neto</span>
+<div class="size-8 bg-primary/10 text-primary rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">account_balance_wallet</span>
+</div>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-black text-primary">$4,250.00</span>
+<span class="text-xs font-bold text-primary">+7%</span>
+</div>
+</div>
+</div>
+<!-- Table Component -->
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+<div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+<h3 class="font-bold text-slate-800 dark:text-slate-200">Historial Reciente</h3>
+<button class="text-xs font-bold text-primary hover:underline">Ver todo</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-800/50">
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Concepto</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Monto</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Fecha</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Usuario</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Acciones</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]">payments</span>
+</div>
+<span class="text-sm font-medium">Pago de Cliente #012</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm font-bold text-green-600">+$2,500.00</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">12 Oct 2023</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">Juan Pérez</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors">
+<span class="material-symbols-outlined text-slate-400 text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]">home</span>
+</div>
+<span class="text-sm font-medium">Alquiler Oficina Central</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm font-bold text-red-600">-$1,200.00</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">10 Oct 2023</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">Admin</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors">
+<span class="material-symbols-outlined text-slate-400 text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]">cloud</span>
+</div>
+<span class="text-sm font-medium">Suscripción SaaS (AWS)</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm font-bold text-red-600">-$49.00</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">08 Oct 2023</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">Sistemas</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors">
+<span class="material-symbols-outlined text-slate-400 text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]">inventory_2</span>
+</div>
+<span class="text-sm font-medium">Venta Producto X</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm font-bold text-green-600">+$850.00</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">05 Oct 2023</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">Maria Garcia</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors">
+<span class="material-symbols-outlined text-slate-400 text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+<p class="text-xs text-slate-500 font-medium">Mostrando 4 de 125 movimientos</p>
+<div class="flex items-center gap-2">
+<button class="p-1.5 border border-slate-200 dark:border-slate-800 rounded hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-400">
+<span class="material-symbols-outlined text-[16px]">chevron_left</span>
+</button>
+<button class="p-1.5 border border-slate-200 dark:border-slate-800 rounded hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-400">
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Modal Background Layer (Hidden by default, shown for UI demonstration) -->
+<!-- Remove 'hidden' class to see the modal -->
+<div class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" id="modal">
+<div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+<div class="px-6 py-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+<div>
+<h3 class="text-lg font-bold text-slate-900 dark:text-white leading-none">Nuevo Movimiento</h3>
+<p class="text-xs text-slate-500 mt-1.5">Completa los detalles de la transacción financiera.</p>
+</div>
+<button class="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<form class="p-6 space-y-5">
+<div class="space-y-2">
+<label class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Concepto</label>
+<input class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Ej. Pago Proveedor, Venta directa..." type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Monto</label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">$</span>
+<input class="w-full pl-7 pr-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="0.00" step="0.01" type="number"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Tipo</label>
+<select class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+<option value="ingreso">Ingreso (+)</option>
+<option value="egreso">Egreso (-)</option>
+</select>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Fecha</label>
+<div class="relative">
+<input class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" type="date"/>
+</div>
+</div>
+<div class="pt-4 flex items-center justify-end gap-3">
+<button class="px-4 py-2 text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" type="button">Cancelar</button>
+<button class="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg font-bold text-sm shadow-md transition-all" type="submit">Guardar Transacción</button>
+</div>
+</form>
+</div>
+</div>
+</body></html>

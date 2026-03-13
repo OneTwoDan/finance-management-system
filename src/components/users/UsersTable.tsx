@@ -75,7 +75,7 @@ export function UsersTable() {
                   {user.phone}
                 </TableCell>
                 <TableCell className="px-6 py-4 text-right">
-                  <EditUserDialog defaultName={user.name} defaultRole={user.role}>
+                  <EditUserDialog defaultName={user.name} defaultRole={user.role} defaultEmail={user.email}>
                     <button className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline">
                       <span className="material-symbols-outlined text-[16px]">edit</span>
                       Editar

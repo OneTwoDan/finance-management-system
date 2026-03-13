@@ -73,6 +73,8 @@ body {
   --sidebar-border: oklch(0.922 0 0);
 
   --sidebar-ring: oklch(0.708 0 0);
+
+  --primary: oklch(0.435 0.165 264.407); /* #1152d4 approx */
 }
 
 .dark {
@@ -219,6 +221,10 @@ body {
   --radius-3xl: calc(var(--radius) * 2.2);
 
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  --color-background-light: #f6f6f8;
+  --color-background-dark: #101622;
+  --font-display: "Inter", sans-serif;
 }
 
 @layer base {
@@ -227,8 +233,13 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
   }
   html {
     @apply font-sans;
   }
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }

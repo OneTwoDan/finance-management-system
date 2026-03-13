@@ -10,9 +10,10 @@ export interface Breadcrumb {
 
 export interface HeaderProps {
   breadcrumbs?: Breadcrumb[];
+  headerActions?: React.ReactNode;
 }
 
-export function Header({ breadcrumbs }: HeaderProps) {
+export function Header({ breadcrumbs, headerActions }: HeaderProps) {
   return (
     <header className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-10 px-8 flex items-center justify-between">
       <div className="flex items-center gap-4 flex-1">
@@ -48,6 +49,7 @@ export function Header({ breadcrumbs }: HeaderProps) {
         )}
       </div>
       <div className="flex items-center gap-4">
+        {headerActions}
         <button className="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg relative">
           <span className="material-symbols-outlined">notifications</span>
           <span className="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>

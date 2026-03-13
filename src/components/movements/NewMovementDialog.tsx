@@ -9,83 +9,129 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 
 export function NewMovementDialog({ children }: { children: ReactNode }) {
+  const [type, setType] = useState<"INGRESO" | "EGRESO">("INGRESO");
+
   return (
     <Dialog>
       <DialogTrigger render={typeof children === 'string' ? undefined : (children as any)}>
         {typeof children === 'string' ? children : undefined}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden p-0 gap-0 [&>button]:hidden">
-        <DialogHeader className="px-6 py-5 border-b border-slate-200 dark:border-slate-800 flex flex-row items-center justify-between w-full">
+      <DialogContent className="sm:max-w-[32rem] bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden p-0 gap-0 [&>button]:hidden rounded-xl">
+        <DialogHeader className="px-6 py-4 border-b border-slate-100 dark:border-slate-900 flex flex-row items-center justify-between w-full m-0">
           <div className="flex flex-col text-left space-y-1.5 text-slate-900 dark:text-white">
-            <DialogTitle className="text-lg font-bold leading-none">Nuevo Movimiento</DialogTitle>
-            <DialogDescription className="text-xs text-slate-500 mt-1.5 hidden">
-              Completa los detalles de la transacción financiera.
-            </DialogDescription>
-            <p className="text-xs text-slate-500 mt-1.5">Completa los detalles de la transacción financiera.</p>
+            <DialogTitle className="text-lg font-bold leading-none">Nuevo Movimiento de Dinero</DialogTitle>
+            <DialogDescription className="hidden">Completa los detalles de la transacción financiera.</DialogDescription>
           </div>
-          <DialogClose render={<button className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"><span className="material-symbols-outlined">close</span></button>} />
+          <DialogClose render={<button type="button" className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"><span className="material-symbols-outlined">close</span></button>} />
         </DialogHeader>
-        <form className="p-6 space-y-5">
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Concepto</label>
-            <Input 
-              className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 text-sm focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary transition-all h-auto" 
-              placeholder="Ej. Pago Proveedor, Venta directa..." 
-              type="text"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
+
+        <form className="p-8 space-y-6">
+          <div className="space-y-4">
+            {/* Concepto Field */}
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Monto</label>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300" htmlFor="concepto">
+                Concepto
+              </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">$</span>
-                <Input 
-                  className="w-full pl-7 pr-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 text-sm focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary transition-all h-auto" 
-                  placeholder="0.00" 
-                  step="0.01" 
-                  type="number"
+                <Input
+                  id="concepto"
+                  className="w-full h-12 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 text-sm focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary transition-all placeholder:text-slate-400"
+                  placeholder="Ej. Pago de servicios mensual"
+                  type="text"
                 />
               </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Tipo</label>
-              <Select defaultValue="ingreso">
-                <SelectTrigger className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all h-auto">
-                  <SelectValue placeholder="Tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ingreso">Ingreso (+)</SelectItem>
-                  <SelectItem value="egreso">Egreso (-)</SelectItem>
-                </SelectContent>
-              </Select>
+
+            <div className="grid grid-cols-2 gap-4">
+              {/* Monto Field */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700 dark:text-slate-300" htmlFor="monto">
+                  Monto
+                </label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <span className="text-slate-400 group-focus-within:text-primary transition-colors">$</span>
+                  </div>
+                  <Input
+                    id="monto"
+                    className="w-full h-12 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg pl-8 pr-4 text-sm focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary transition-all placeholder:text-slate-400 font-medium"
+                    placeholder="0.00"
+                    type="number"
+                    step="0.01"
+                  />
+                </div>
+              </div>
+
+              {/* Fecha Field */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700 dark:text-slate-300" htmlFor="fecha">
+                  Fecha
+                </label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                    <span className="material-symbols-outlined text-slate-400 text-xl group-focus-within:text-primary transition-colors">calendar_today</span>
+                  </div>
+                  <Input
+                    id="fecha"
+                    className="w-full h-12 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 pr-10 text-sm focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary transition-all appearance-none [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full"
+                    type="date"
+                    defaultValue="2023-10-27"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Optional Transaction Type */}
+            <div className="space-y-2 pt-2">
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                Tipo de movimiento
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setType("INGRESO")}
+                  className={`flex items-center justify-center gap-2 h-10 rounded-lg border-2 text-xs font-bold transition-all ${
+                    type === "INGRESO"
+                      ? "border-primary bg-primary/5 text-primary"
+                      : "border-transparent bg-slate-100 dark:bg-slate-900 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800"
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-base">arrow_upward</span>
+                  INGRESO
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setType("EGRESO")}
+                  className={`flex items-center justify-center gap-2 h-10 rounded-lg border-2 text-xs font-bold transition-all ${
+                    type === "EGRESO"
+                      ? "border-primary bg-primary/5 text-primary"
+                      : "border-transparent bg-slate-100 dark:bg-slate-900 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800"
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-base">arrow_downward</span>
+                  EGRESO
+                </button>
+              </div>
             </div>
           </div>
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Fecha</label>
-            <div className="relative">
-              <Input 
-                className="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 text-sm focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary transition-all h-auto block" 
-                type="date"
-              />
-            </div>
-          </div>
-          <div className="pt-4 flex items-center justify-end gap-3">
-            <DialogClose render={<Button variant="ghost" className="px-4 py-2 text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" type="button">Cancelar</Button>} />
-            <Button className="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg font-bold text-sm shadow-md transition-all h-auto" type="submit">
-              Guardar Transacción
+
+          <div className="flex flex-col gap-3 pt-4">
+            <Button className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2" type="submit">
+              <span className="material-symbols-outlined text-xl">add_circle</span>
+              Ingresar Movimiento
             </Button>
+            <DialogClose render={<Button type="button" variant="ghost" className="w-full h-10 flex items-center justify-center text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 text-sm font-medium transition-colors hover:bg-transparent">Cancelar</Button>} />
           </div>
         </form>
+
+        <div className="px-8 py-4 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-900 text-center">
+          <p className="text-[11px] text-slate-400 uppercase tracking-widest font-semibold">
+            Se guardará en la cuenta principal de ahorros
+          </p>
+        </div>
       </DialogContent>
     </Dialog>
   );

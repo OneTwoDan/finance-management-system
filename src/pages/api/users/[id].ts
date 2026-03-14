@@ -3,6 +3,42 @@ import { UserService } from "@/services/UserService";
 import { requireAuth, AuthenticatedSession } from "@/utils/middleware";
 import { rbac } from "@/utils/rbac";
 
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   patch:
+ *     summary: Update a user
+ *     description: Modifies fields for a specific user. Requires ADMIN role.
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The user ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Nuevo Nombre
+ *               role:
+ *                 type: string
+ *                 example: ADMIN
+ *     responses:
+ *       200:
+ *         description: User updated successfully.
+ *       400:
+ *         description: Invalid user ID.
+ *       403:
+ *         description: Forbidden. Insufficient permissions.
+ */
+
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse,

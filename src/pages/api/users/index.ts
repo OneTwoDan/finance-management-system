@@ -3,6 +3,42 @@ import { UserService } from "@/services/UserService";
 import { requireAuth, AuthenticatedSession } from "@/utils/middleware";
 import { rbac } from "@/utils/rbac";
 
+/**
+ * @swagger
+ * /api/users:
+ *   get:
+ *     summary: Retrieve all users
+ *     description: Returns a list of all users in the system. Requires ADMIN role.
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: A list of users.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     example: uid123
+ *                   name:
+ *                     type: string
+ *                     example: Admin User
+ *                   email:
+ *                     type: string
+ *                     example: admin@sgf.com
+ *                   role:
+ *                     type: string
+ *                     example: ADMIN
+ *                   createdAt:
+ *                     type: string
+ *                     example: 2023-01-01T00:00:00Z
+ *       403:
+ *         description: Forbidden.
+ */
+
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse,

@@ -3,6 +3,45 @@ import { ReportService } from "@/services/ReportService";
 import { requireAuth, AuthenticatedSession } from "@/utils/middleware";
 import { rbac } from "@/utils/rbac";
 
+/**
+ * @swagger
+ * /api/reports:
+ *   get:
+ *     summary: Retrieve aggregate reports
+ *     description: Returns aggregated balance, income, expenses, and weekly summary. Requires ADMIN role.
+ *     tags: [Reports]
+ *     responses:
+ *       200:
+ *         description: A report summary object.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 currentBalance:
+ *                   type: number
+ *                   example: 125430
+ *                 incomeThisMonth:
+ *                   type: number
+ *                   example: 45200
+ *                 expensesThisMonth:
+ *                   type: number
+ *                   example: 12850
+ *                 movementsSummary:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       day:
+ *                         type: string
+ *                         example: Lun
+ *                       amount:
+ *                         type: number
+ *                         example: 22000
+ *       403:
+ *         description: Forbidden. Insufficient permissions.
+ */
+
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse,

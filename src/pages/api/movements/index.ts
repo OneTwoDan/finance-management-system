@@ -4,6 +4,72 @@ import { requireAuth, AuthenticatedSession } from "@/utils/middleware";
 import { rbac } from "@/utils/rbac";
 import { Role } from "@prisma/client";
 
+/**
+ * @swagger
+ * /api/movements:
+ *   get:
+ *     summary: Retrieve a list of movements
+ *     description: Returns a list of all movements for the authenticated user.
+ *     tags: [Movements]
+ *     responses:
+ *       200:
+ *         description: A list of movements.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     example: 123
+ *                   concept:
+ *                     type: string
+ *                     example: Pago de Cliente
+ *                   amount:
+ *                     type: number
+ *                     example: 2500
+ *                   date:
+ *                     type: string
+ *                     example: 2023-10-12
+ *                   userId:
+ *                     type: string
+ *                     example: abc
+ *                   createdAt:
+ *                     type: string
+ *                     example: 2023-10-12T10:00:00Z
+ *   post:
+ *     summary: Create a new movement
+ *     description: Creates a new financial movement. Requires ADMIN role.
+ *     tags: [Movements]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - concept
+ *               - amount
+ *               - date
+ *             properties:
+ *               concept:
+ *                 type: string
+ *                 example: Alquiler
+ *               amount:
+ *                 type: number
+ *                 example: -1200
+ *               date:
+ *                 type: string
+ *                 example: 2023-10-10
+ *     responses:
+ *       201:
+ *         description: Movement created successfully.
+ *       403:
+ *         description: Forbidden. Insufficient permissions.
+ */
+
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse,

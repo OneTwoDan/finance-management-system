@@ -26,4 +26,5 @@ export interface ReportSummary {
     day: string;
     amount: number;
   }[];
+  movements: Movement[];
 }

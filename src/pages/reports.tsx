@@ -4,25 +4,50 @@ import { PageHeader } from "@/components/PageHeader";
 import { ReportsSummaryCards } from "@/components/reports/ReportsSummaryCards";
 import { ReportsChart } from "@/components/reports/ReportsChart";
 import { ReportsRecentActivity } from "@/components/reports/ReportsRecentActivity";
-import { Movement, ReportSummary } from "@/types";
+import { ReportSummary } from "@/types";
+
+function LoadingSpinner() {
+  return (
+    <div className="flex flex-col items-center justify-center py-24 gap-4">
+      <svg
+        className="animate-spin h-10 w-10 text-indigo-500"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        aria-label="Cargando"
+      >
+        <circle
+          className="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        />
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+        />
+      </svg>
+      <span className="text-sm text-slate-500">Cargando reportes...</span>
+    </div>
+  );
+}
 
 export default function ReportsPage() {
   const [reportSummary, setReportSummary] = useState<ReportSummary | null>(null);
-  const [movements, setMovements] = useState<Movement[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const [summaryRes, movementsRes] = await Promise.all([
-          fetch("/api/reports"),
-          fetch("/api/movements"),
-        ]);
-        const summaryData = await summaryRes.json();
-        const movementsData = await movementsRes.json();
-        setReportSummary(summaryData);
-        setMovements(movementsData);
+        // Single request — movements are now included in the report summary
+        // response, so we avoid a second round-trip + auth session check.
+        const res = await fetch("/api/reports");
+        const data: ReportSummary = await res.json();
+        setReportSummary(data);
       } catch (error) {
         console.error("Failed to fetch report data:", error);
       } finally {
@@ -77,16 +102,16 @@ export default function ReportsPage() {
         </PageHeader>
 
         {isLoading ? (
-          <div className="py-20 text-center text-slate-500">Cargando reportes...</div>
+          <LoadingSpinner />
         ) : reportSummary ? (
           <>
-            <ReportsSummaryCards 
+            <ReportsSummaryCards
               currentBalance={reportSummary.currentBalance}
               incomeThisMonth={reportSummary.incomeThisMonth}
               expensesThisMonth={reportSummary.expensesThisMonth}
             />
             <ReportsChart data={reportSummary.movementsSummary} />
-            <ReportsRecentActivity movements={movements} />
+            <ReportsRecentActivity movements={reportSummary.movements} />
           </>
         ) : (
           <div className="py-20 text-center text-red-500">Error al cargar los datos.</div>

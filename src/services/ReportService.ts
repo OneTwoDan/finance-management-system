@@ -4,10 +4,11 @@ import { MovementRepository } from "@/repositories/MovementRepository";
 export class ReportService {
   /**
    * getReportSummary
-   * Resolves with a calculated summary of income and expenses based on Database movements
+   * Resolves with a calculated summary of income and expenses, plus the full
+   * movements list. Returning both from one DB call avoids a duplicate query.
    */
   static async getReportSummary(): Promise<ReportSummary> {
-    const movements = await MovementRepository.findAll();
+    const rawMovements = await MovementRepository.findAll();
 
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth();
@@ -20,7 +21,7 @@ export class ReportService {
     const days = ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"];
     const movementsSummary = days.map((day) => ({ day, amount: 0 }));
 
-    movements.forEach((m) => {
+    rawMovements.forEach((m) => {
       currentBalance += m.amount;
 
       const mDate = new Date(m.date);
@@ -35,16 +36,24 @@ export class ReportService {
         // We want 0=Lun, 6=Dom
         let dayOfWeek = mDate.getDay() - 1;
         if (dayOfWeek === -1) dayOfWeek = 6;
-        
+
         movementsSummary[dayOfWeek].amount += m.amount;
       }
     });
+
+    // Serialize Prisma Date objects to ISO strings to match the Movement type
+    const movements = rawMovements.map((m) => ({
+      ...m,
+      date: m.date instanceof Date ? m.date.toISOString() : String(m.date),
+      createdAt: m.createdAt instanceof Date ? m.createdAt.toISOString() : String(m.createdAt),
+    }));
 
     return {
       currentBalance,
       incomeThisMonth,
       expensesThisMonth,
       movementsSummary,
+      movements,
     };
   }
 }

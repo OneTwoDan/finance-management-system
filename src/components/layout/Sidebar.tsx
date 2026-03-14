@@ -1,7 +1,24 @@
 import { SidebarLink } from "./SidebarLink";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/router";
 
 export function Sidebar() {
+  const { data: session } = authClient.useSession();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/login"); // redirect to login page
+        },
+      },
+    });
+  };
+
+  const user = session?.user;
+
   return (
     <aside className="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hidden md:flex flex-col">
       <div className="p-6 flex items-center gap-3">
@@ -16,19 +33,24 @@ export function Sidebar() {
         <SidebarLink href="/users" icon="group" label="Usuarios" />
         <SidebarLink href="/reports" icon="bar_chart" label="Reportes" />
       </nav>
-      <div className="p-4 border-t border-slate-200 dark:border-slate-800">
-        <div className="flex items-center gap-3 p-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
-          <Avatar className="size-10">
-            <AvatarImage src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNExshRWnCY1e-sa9Mw53MVQKJCT73yU1AiFAuESd0mCjgfYcWIZ0rHg2MGxNWeH7C3H9VdH6uz_5ENETX64qefikoP9mgCAhgVCv7uHrlkCYyDxM1eJcOZsyTGUib1xq8WJikD8TXBq67mxICpgXXmIJOQLh6a-MIOGaHKhXwnoxePdgifNadE2n_stBHf_tCBUV_LzQG19bb_iR3Xv71vjefLdkMzLSjZQe4whiN_nzieAD6BGH6Qg53dWe7VKWCbsE1hzjG_V4K" alt="Admin User" />
-            <AvatarFallback>AU</AvatarFallback>
-          </Avatar>
-          <div className="flex-1 overflow-hidden">
-            <p className="text-sm font-semibold truncate">Admin User</p>
-            <p className="text-xs text-slate-500 truncate">admin@sgf.com</p>
+      {user && (
+        <div className="p-4 border-t border-slate-200 dark:border-slate-800">
+          <div 
+            onClick={handleLogout}
+            className="flex items-center gap-3 p-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+          >
+            <Avatar className="size-10">
+              <AvatarImage src={user.image || undefined} alt={user.name} />
+              <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1 overflow-hidden">
+              <p className="text-sm font-semibold truncate">{user.name}</p>
+              <p className="text-xs text-slate-500 truncate">{user.email}</p>
+            </div>
+            <span className="material-symbols-outlined text-slate-400 text-sm">logout</span>
           </div>
-          <span className="material-symbols-outlined text-slate-400 text-sm">logout</span>
         </div>
-      </div>
+      )}
     </aside>
   );
 }

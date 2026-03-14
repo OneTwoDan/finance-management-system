@@ -1,12 +1,17 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { ReportService } from "@/services/ReportService";
-import { withAuth } from "@/utils/middleware";
-import { Role } from "@prisma/client";
+import { requireAuth, AuthenticatedSession } from "@/utils/middleware";
+import { rbac } from "@/utils/rbac";
 
 async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
+  session: AuthenticatedSession
 ) {
+  if (!rbac.requireAdmin(session)) {
+    return res.status(403).json({ error: "Forbidden: insufficient permissions" });
+  }
+
   if (req.method === "GET") {
     try {
       const summary = await ReportService.getReportSummary();
@@ -21,4 +26,4 @@ async function handler(
   return res.status(405).end(`Method ${req.method} Not Allowed`);
 }
 
-export default withAuth(handler, [Role.ADMIN]);
+export default requireAuth(handler);

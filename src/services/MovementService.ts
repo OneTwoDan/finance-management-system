@@ -1,58 +1,38 @@
 import { Movement } from "@/types";
-
-// Mock Data
-let mockMovements: Movement[] = [
-  {
-    id: "1",
-    concept: "Pago de Cliente #012",
-    amount: 2500.0,
-    date: "2023-10-12",
-    userId: "1",
-    createdAt: new Date("2023-10-12T10:00:00Z").toISOString(),
-  },
-  {
-    id: "2",
-    concept: "Alquiler Oficina Central",
-    amount: -1200.0,
-    date: "2023-10-10",
-    userId: "1",
-    createdAt: new Date("2023-10-10T14:30:00Z").toISOString(),
-  },
-  {
-    id: "3",
-    concept: "Suscripción SaaS (AWS)",
-    amount: -49.0,
-    date: "2023-10-08",
-    userId: "1",
-    createdAt: new Date("2023-10-08T09:15:00Z").toISOString(),
-  },
-];
+import { MovementRepository } from "@/repositories/MovementRepository";
 
 export class MovementService {
   /**
    * getMovements
-   * Fetches the list of all mocked movements
+   * Fetches the list of all movements from the database
    */
   static async getMovements(): Promise<Movement[]> {
-    return [...mockMovements];
+    const movements = await MovementRepository.findAll();
+    return movements.map((m) => ({
+      ...m,
+      date: m.date.toISOString(),
+      createdAt: m.createdAt.toISOString(),
+    }));
   }
 
   /**
    * createMovement
-   * Appends a new movement to the mock data array
+   * Appends a new movement to the database
    */
   static async createMovement(
-    data: Omit<Movement, "id" | "createdAt">
+    data: Omit<Movement, "id" | "createdAt" | "date"> & { date: string }
   ): Promise<Movement> {
-    const newMovement: Movement = {
-      ...data,
-      id: Math.random().toString(36).substring(2, 9),
-      createdAt: new Date().toISOString(),
+    const newMovement = await MovementRepository.create({
+      concept: data.concept,
+      amount: data.amount,
+      date: new Date(data.date),
+      userId: data.userId,
+    });
+    
+    return {
+      ...newMovement,
+      date: newMovement.date.toISOString(),
+      createdAt: newMovement.createdAt.toISOString(),
     };
-    
-    // Simulate insertion
-    mockMovements = [newMovement, ...mockMovements];
-    
-    return newMovement;
   }
 }

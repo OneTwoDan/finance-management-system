@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { MovementService } from "@/services/MovementService";
-import { withAuth, AuthenticatedSession } from "@/utils/middleware";
+import { requireAuth, AuthenticatedSession } from "@/utils/middleware";
 import { rbac } from "@/utils/rbac";
 import { Role } from "@prisma/client";
 
@@ -10,8 +10,8 @@ async function handler(
   session: AuthenticatedSession
 ) {
   if (req.method === "GET") {
+    // GET /api/movements -> authenticated user (handled by requireAuth wrapper)
     try {
-      // NOTE: MovementService might need to be adjusted to filter by user
       const movements = await MovementService.getMovements();
       return res.status(200).json(movements);
     } catch (error) {
@@ -20,6 +20,11 @@ async function handler(
   }
 
   if (req.method === "POST") {
+    // POST /api/movements -> ADMIN
+    if (!rbac.requireAdmin(session)) {
+      return res.status(403).json({ error: "Forbidden: insufficient permissions" });
+    }
+
     try {
       const data = { ...req.body, userId: session.user.id };
       const newMovement = await MovementService.createMovement(data);
@@ -34,4 +39,4 @@ async function handler(
   return res.status(405).end(`Method ${req.method} Not Allowed`);
 }
 
-export default withAuth(handler, [Role.ADMIN, Role.USER]);
+export default requireAuth(handler);

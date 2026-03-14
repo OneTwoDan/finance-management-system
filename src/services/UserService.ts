@@ -1,62 +1,38 @@
 import { User, Role } from "@/types";
-
-let mockUsers: User[] = [
-  {
-    id: "1",
-    name: "Juan Pérez",
-    email: "juan.perez@example.com",
-    phone: "+123456789",
-    role: "ADMIN",
-    createdAt: new Date("2023-01-01T00:00:00Z").toISOString(),
-  },
-  {
-    id: "2",
-    name: "Maria Garcia",
-    email: "maria.garcia@example.com",
-    phone: "+987654321",
-    role: "USER",
-    createdAt: new Date("2023-02-15T00:00:00Z").toISOString(),
-  },
-  {
-    id: "3",
-    name: "Carlos Rodriguez",
-    email: "carlos.rod@example.com",
-    phone: "+112233445",
-    role: "USER",
-    createdAt: new Date("2023-05-10T00:00:00Z").toISOString(),
-  },
-];
+import { UserRepository } from "@/repositories/UserRepository";
 
 export class UserService {
   /**
    * getUsers
-   * Returns a list of mocked active users
+   * Returns a list of active users from the database
    */
   static async getUsers(): Promise<User[]> {
-    return [...mockUsers];
+    const users = await UserRepository.findAll();
+    return users.map((user) => ({
+      ...user,
+      createdAt: user.createdAt.toISOString(),
+      phone: user.phone || "",
+    })) as User[];
   }
 
   /**
    * updateUser
-   * Updates fields for an existing mock user
+   * Updates fields for an existing user in the database
    */
   static async updateUser(
     id: string,
     updates: { name?: string; role?: Role }
   ): Promise<User | null> {
-    const userIndex = mockUsers.findIndex((u) => u.id === id);
-
-    if (userIndex === -1) {
+    try {
+      const updatedUser = await UserRepository.update(id, updates);
+      return {
+        ...updatedUser,
+        createdAt: updatedUser.createdAt.toISOString(),
+        phone: updatedUser.phone || "",
+      } as User;
+    } catch (error) {
+      console.error("Failed to update user:", error);
       return null;
     }
-
-    const updatedUser = {
-      ...mockUsers[userIndex],
-      ...updates,
-    };
-
-    mockUsers[userIndex] = updatedUser;
-    
-    return updatedUser;
   }
 }

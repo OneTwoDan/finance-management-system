@@ -1,3 +1,5 @@
+import Link from "next/link";
+import Image from "next/image";
 import { SidebarLink } from "./SidebarLink";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { authClient } from "@/lib/auth-client";
@@ -8,7 +10,6 @@ type NavLink = { href: string; icon: string; label: string; roles?: string[] };
 // Each nav item can have an optional `roles` allowlist.
 // If omitted, the link is visible to all authenticated users.
 const NAV_LINKS: NavLink[] = [
-  { href: "/home",      icon: "home",       label: "Inicio",      roles: ["ADMIN"] },
   { href: "/movements", icon: "swap_horiz", label: "Movimientos"                   },
   { href: "/users",     icon: "group",      label: "Usuarios",    roles: ["ADMIN"] },
   { href: "/reports",   icon: "bar_chart",  label: "Reportes",    roles: ["ADMIN"] },
@@ -38,12 +39,9 @@ export function Sidebar() {
 
   return (
     <aside className="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hidden md:flex flex-col">
-      <div className="p-6 flex items-center gap-3">
-        <div className="bg-primary p-2 rounded-lg">
-          <span className="material-symbols-outlined text-white">account_balance_wallet</span>
-        </div>
-        <h2 className="font-bold text-lg tracking-tight">SGF Pro</h2>
-      </div>
+      <Link href="/home" className="p-5 flex items-center cursor-pointer">
+        <Image src="/logo.png" alt="SGF Pro" width={210} height={40} priority />
+      </Link>
       <nav className="flex-1 px-4 space-y-1 mt-4">
         {visibleLinks.map((link) => (
           <SidebarLink

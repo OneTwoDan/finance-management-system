@@ -3,6 +3,17 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/router";
 
+type NavLink = { href: string; icon: string; label: string; roles?: string[] };
+
+// Each nav item can have an optional `roles` allowlist.
+// If omitted, the link is visible to all authenticated users.
+const NAV_LINKS: NavLink[] = [
+  { href: "/home",      icon: "home",       label: "Inicio",      roles: ["ADMIN"] },
+  { href: "/movements", icon: "swap_horiz", label: "Movimientos"                   },
+  { href: "/users",     icon: "group",      label: "Usuarios",    roles: ["ADMIN"] },
+  { href: "/reports",   icon: "bar_chart",  label: "Reportes",    roles: ["ADMIN"] },
+];
+
 export function Sidebar() {
   const { data: session } = authClient.useSession();
   const router = useRouter();
@@ -11,13 +22,19 @@ export function Sidebar() {
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
-          router.push("/login"); // redirect to login page
+          router.push("/login");
         },
       },
     });
   };
 
   const user = session?.user;
+  const role = (user as any)?.role as string | undefined;
+
+  // Filter links the current user is allowed to see
+  const visibleLinks = NAV_LINKS.filter(
+    (link) => !link.roles || (role && link.roles.includes(role as "ADMIN"))
+  );
 
   return (
     <aside className="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hidden md:flex flex-col">
@@ -28,14 +45,19 @@ export function Sidebar() {
         <h2 className="font-bold text-lg tracking-tight">SGF Pro</h2>
       </div>
       <nav className="flex-1 px-4 space-y-1 mt-4">
-        <SidebarLink href="/home"      icon="home"       label="Inicio"       active={router.pathname === "/home"} />
-        <SidebarLink href="/movements" icon="swap_horiz" label="Movimientos"  active={router.pathname === "/movements"} />
-        <SidebarLink href="/users"     icon="group"      label="Usuarios"     active={router.pathname === "/users"} />
-        <SidebarLink href="/reports"   icon="bar_chart"  label="Reportes"     active={router.pathname === "/reports"} />
+        {visibleLinks.map((link) => (
+          <SidebarLink
+            key={link.href}
+            href={link.href}
+            icon={link.icon}
+            label={link.label}
+            active={router.pathname === link.href}
+          />
+        ))}
       </nav>
       {user && (
         <div className="p-4 border-t border-slate-200 dark:border-slate-800">
-          <div 
+          <div
             onClick={handleLogout}
             className="flex items-center gap-3 p-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
           >
@@ -54,3 +76,4 @@ export function Sidebar() {
     </aside>
   );
 }
+

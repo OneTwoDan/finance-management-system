@@ -1,6 +1,5 @@
 import { Layout } from "@/components/layout/Layout";
 import { HomeCards } from "@/components/home/HomeCards";
-import { RecentActivity } from "@/components/home/RecentActivity";
 
 export default function HomePage() {
   return (
@@ -16,7 +15,6 @@ export default function HomePage() {
       </div>
 
       <HomeCards />
-      <RecentActivity />
     </Layout>
   );
 }

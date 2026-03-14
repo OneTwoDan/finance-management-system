@@ -1,10 +1,8 @@
-import { withSwagger } from 'next-swagger-doc';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { getApiDocs } from '@/lib/swagger';
 
-const swaggerHandler = withSwagger({
-  openApiVersion: '3.0.0',
-  title: 'Finance Management System API',
-  version: '1.0',
-  apiFolder: 'src/pages/api',
-});
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const spec = await getApiDocs();
+  res.status(200).json(spec);
+}
 
-export default swaggerHandler();

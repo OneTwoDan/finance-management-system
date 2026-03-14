@@ -28,10 +28,10 @@ export function Sidebar() {
         <h2 className="font-bold text-lg tracking-tight">SGF Pro</h2>
       </div>
       <nav className="flex-1 px-4 space-y-1 mt-4">
-        <SidebarLink href="/home" icon="home" label="Inicio" active />
-        <SidebarLink href="/movements" icon="swap_horiz" label="Movimientos" />
-        <SidebarLink href="/users" icon="group" label="Usuarios" />
-        <SidebarLink href="/reports" icon="bar_chart" label="Reportes" />
+        <SidebarLink href="/home"      icon="home"       label="Inicio"       active={router.pathname === "/home"} />
+        <SidebarLink href="/movements" icon="swap_horiz" label="Movimientos"  active={router.pathname === "/movements"} />
+        <SidebarLink href="/users"     icon="group"      label="Usuarios"     active={router.pathname === "/users"} />
+        <SidebarLink href="/reports"   icon="bar_chart"  label="Reportes"     active={router.pathname === "/reports"} />
       </nav>
       {user && (
         <div className="p-4 border-t border-slate-200 dark:border-slate-800">

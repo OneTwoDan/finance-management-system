@@ -8,6 +8,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Movement } from "@/types";
+import { EditMovementDialog } from "./EditMovementDialog";
+import { DeleteMovementDialog } from "./DeleteMovementDialog";
 
 const PAGE_SIZE = 6;
 
@@ -17,6 +19,7 @@ type SortDir = "asc" | "desc";
 export interface MovementsTableProps {
   movements: Movement[];
   isLoading?: boolean;
+  onMovementsChange?: (updated: Movement[]) => void;
 }
 
 function formatDate(isoString: string): string {
@@ -40,10 +43,16 @@ function SortIcon({ dir, active }: { dir: SortDir; active: boolean }) {
   );
 }
 
-export function MovementsTable({ movements, isLoading = false }: MovementsTableProps) {
+export function MovementsTable({
+  movements,
+  isLoading = false,
+  onMovementsChange,
+}: MovementsTableProps) {
   const [page, setPage] = useState(1);
   const [sortKey, setSortKey] = useState<SortKey>("date");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [editingMovement, setEditingMovement] = useState<Movement | null>(null);
+  const [deletingMovement, setDeletingMovement] = useState<Movement | null>(null);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -58,10 +67,10 @@ export function MovementsTable({ movements, isLoading = false }: MovementsTableP
   const sorted = [...movements].sort((a, b) => {
     let aVal: string | number = "";
     let bVal: string | number = "";
-    if (sortKey === "concept") { aVal = a.concept.toLowerCase(); bVal = b.concept.toLowerCase(); }
-    if (sortKey === "amount")  { aVal = a.amount; bVal = b.amount; }
-    if (sortKey === "date")    { aVal = a.date; bVal = b.date; }
-    if (sortKey === "userName"){ aVal = (a.userName ?? "").toLowerCase(); bVal = (b.userName ?? "").toLowerCase(); }
+    if (sortKey === "concept")  { aVal = a.concept.toLowerCase(); bVal = b.concept.toLowerCase(); }
+    if (sortKey === "amount")   { aVal = a.amount; bVal = b.amount; }
+    if (sortKey === "date")     { aVal = a.date; bVal = b.date; }
+    if (sortKey === "userName") { aVal = (a.userName ?? "").toLowerCase(); bVal = (b.userName ?? "").toLowerCase(); }
     if (aVal < bVal) return sortDir === "asc" ? -1 : 1;
     if (aVal > bVal) return sortDir === "asc" ? 1 : -1;
     return 0;
@@ -69,6 +78,19 @@ export function MovementsTable({ movements, isLoading = false }: MovementsTableP
 
   const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
   const paginated = sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const handleSaved = (updated: Movement) => {
+    const next = movements.map((m) => (m.id === updated.id ? updated : m));
+    onMovementsChange?.(next);
+  };
+
+  const handleDeleted = (id: string) => {
+    const next = movements.filter((m) => m.id !== id);
+    onMovementsChange?.(next);
+    // Stay on the page or go back if it's now empty
+    const newTotalPages = Math.max(1, Math.ceil(next.length / PAGE_SIZE));
+    if (page > newTotalPages) setPage(newTotalPages);
+  };
 
   const getIconData = (amount: number) => {
     if (amount >= 0) {
@@ -109,109 +131,143 @@ export function MovementsTable({ movements, isLoading = false }: MovementsTableP
   );
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-      <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-        <h3 className="font-bold text-slate-800 dark:text-slate-200">Historial Reciente</h3>
-      </div>
-      <div className="overflow-x-auto">
-        <Table className="w-full text-left border-collapse">
-          <TableHeader>
-            <TableRow className="bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-              <SortableHead label="Concepto"  sortField="concept" />
-              <SortableHead label="Monto"     sortField="amount" />
-              <SortableHead label="Fecha"     sortField="date" />
-              <SortableHead label="Usuario"   sortField="userName" />
-              <TableHead className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right h-auto">
-                Acciones
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody className="divide-y divide-slate-100 dark:divide-slate-800">
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={5} className="px-6 py-12 text-center">
-                  <div className="flex flex-col items-center gap-3 text-slate-400">
-                    <svg
-                      className="animate-spin size-7 text-primary"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
+    <>
+      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+          <h3 className="font-bold text-slate-800 dark:text-slate-200">Historial Reciente</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <Table className="w-full text-left border-collapse">
+            <TableHeader>
+              <TableRow className="bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                <SortableHead label="Concepto"  sortField="concept" />
+                <SortableHead label="Monto"     sortField="amount" />
+                <SortableHead label="Fecha"     sortField="date" />
+                <SortableHead label="Usuario"   sortField="userName" />
+                <TableHead className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right h-auto">
+                  Acciones
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="divide-y divide-slate-100 dark:divide-slate-800">
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center gap-3 text-slate-400">
+                      <svg
+                        className="animate-spin size-7 text-primary"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                      </svg>
+                      <span className="text-sm font-medium">Cargando movimientos...</span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : paginated.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="px-6 py-8 text-center text-slate-500">
+                    No hay movimientos registrados.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                paginated.map((movement) => {
+                  const { icon, iconBgClass, amountClass, formattedAmount } = getIconData(movement.amount);
+                  return (
+                    <TableRow
+                      key={movement.id}
+                      className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors border-0"
                     >
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
-                    </svg>
-                    <span className="text-sm font-medium">Cargando movimientos...</span>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : paginated.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} className="px-6 py-8 text-center text-slate-500">
-                  No hay movimientos registrados.
-                </TableCell>
-              </TableRow>
-            ) : (
-              paginated.map((movement) => {
-                const { icon, iconBgClass, amountClass, formattedAmount } = getIconData(movement.amount);
-                return (
-                  <TableRow key={movement.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors border-0">
-                    <TableCell className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className={`size-8 rounded-full flex items-center justify-center ${iconBgClass}`}>
-                          <span className="material-symbols-outlined text-[16px]">{icon}</span>
+                      <TableCell className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`size-8 rounded-full flex items-center justify-center ${iconBgClass}`}>
+                            <span className="material-symbols-outlined text-[16px]">{icon}</span>
+                          </div>
+                          <span className="text-sm font-medium">{movement.concept}</span>
                         </div>
-                        <span className="text-sm font-medium">{movement.concept}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="px-6 py-4">
-                      <span className={`text-sm font-bold ${amountClass}`}>{formattedAmount}</span>
-                    </TableCell>
-                    <TableCell className="px-6 py-4 text-sm text-slate-500">
-                      {formatDate(movement.date)}
-                    </TableCell>
-                    <TableCell className="px-6 py-4">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
-                        {movement.userName ?? "—"}
-                      </span>
-                    </TableCell>
-                    <TableCell className="px-6 py-4 text-right">
-                      <button className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors">
-                        <span className="material-symbols-outlined text-slate-400 text-[18px]">more_vert</span>
-                      </button>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            )}
-          </TableBody>
-        </Table>
-      </div>
+                      </TableCell>
+                      <TableCell className="px-6 py-4">
+                        <span className={`text-sm font-bold ${amountClass}`}>{formattedAmount}</span>
+                      </TableCell>
+                      <TableCell className="px-6 py-4 text-sm text-slate-500">
+                        {formatDate(movement.date)}
+                      </TableCell>
+                      <TableCell className="px-6 py-4">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
+                          {movement.userName ?? "—"}
+                        </span>
+                      </TableCell>
+                      <TableCell className="px-6 py-4">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => setEditingMovement(movement)}
+                            title="Editar"
+                            className="p-1.5 hover:bg-primary/10 rounded-lg transition-colors group"
+                          >
+                            <span className="material-symbols-outlined text-slate-400 group-hover:text-primary text-[18px]">
+                              edit
+                            </span>
+                          </button>
+                          <button
+                            onClick={() => setDeletingMovement(movement)}
+                            title="Eliminar"
+                            className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors group"
+                          >
+                            <span className="material-symbols-outlined text-slate-400 group-hover:text-red-600 text-[18px]">
+                              delete
+                            </span>
+                          </button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+        </div>
 
-      {/* Pagination */}
-      <div className="px-6 py-4 flex items-center justify-between border-t border-slate-200 dark:border-slate-800">
-        <p className="text-xs text-slate-500 font-medium">
-          {isLoading ? "—" : `Mostrando ${paginated.length} de ${movements.length} movimientos`}
-        </p>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page === 1 || isLoading}
-            className="p-1.5 border border-slate-200 dark:border-slate-800 rounded hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            <span className="material-symbols-outlined text-[16px]">chevron_left</span>
-          </button>
-          <span className="text-xs text-slate-500 font-medium px-1">
-            {isLoading ? "— / —" : `${page} / ${totalPages}`}
-          </span>
-          <button
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            disabled={page === totalPages || isLoading}
-            className="p-1.5 border border-slate-200 dark:border-slate-800 rounded hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-          </button>
+        {/* Pagination */}
+        <div className="px-6 py-4 flex items-center justify-between border-t border-slate-200 dark:border-slate-800">
+          <p className="text-xs text-slate-500 font-medium">
+            {isLoading ? "—" : `Mostrando ${paginated.length} de ${movements.length} movimientos`}
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1 || isLoading}
+              className="p-1.5 border border-slate-200 dark:border-slate-800 rounded hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              <span className="material-symbols-outlined text-[16px]">chevron_left</span>
+            </button>
+            <span className="text-xs text-slate-500 font-medium px-1">
+              {isLoading ? "— / —" : `${page} / ${totalPages}`}
+            </span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages || isLoading}
+              className="p-1.5 border border-slate-200 dark:border-slate-800 rounded hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Dialogs rendered outside the table */}
+      <EditMovementDialog
+        movement={editingMovement}
+        onClose={() => setEditingMovement(null)}
+        onSaved={handleSaved}
+      />
+      <DeleteMovementDialog
+        movement={deletingMovement}
+        onClose={() => setDeletingMovement(null)}
+        onDeleted={handleDeleted}
+      />
+    </>
   );
 }

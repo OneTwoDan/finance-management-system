@@ -26,4 +26,26 @@ export class MovementRepository {
       data,
     });
   }
+
+  /**
+   * update
+   * Updates an existing movement by id
+   */
+  static async update(id: string, data: Prisma.MovementUncheckedUpdateInput) {
+    return prisma.movement.update({
+      where: { id },
+      data,
+      include: { user: true },
+    });
+  }
+
+  /**
+   * remove
+   * Deletes a movement by id
+   */
+  static async remove(id: string) {
+    return prisma.movement.delete({
+      where: { id },
+    });
+  }
 }

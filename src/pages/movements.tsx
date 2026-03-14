@@ -6,15 +6,22 @@ import { NewMovementDialog } from "@/components/movements/NewMovementDialog";
 import { PageHeader } from "@/components/PageHeader";
 import { Movement } from "@/types";
 
-export default function MovementsPage() {
-  const [movements, setMovements] = useState<Movement[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+// Module-level cache: persists across re-mounts (navigating away and back)
+// but is cleared on a hard refresh. Acts as a simple stale-while-revalidate store.
+let movementsCache: Movement[] | null = null;
 
-  const fetchMovements = async () => {
+export default function MovementsPage() {
+  const [movements, setMovements] = useState<Movement[]>(movementsCache ?? []);
+  // Only show the spinner when there is no cached data yet
+  const [isLoading, setIsLoading] = useState(movementsCache === null);
+
+  const fetchMovements = async ({ silent = false } = {}) => {
+    if (!silent) setIsLoading(true);
     try {
       const res = await fetch("/api/movements");
       if (!res.ok) throw new Error("Failed to fetch");
-      const data = await res.json();
+      const data: Movement[] = await res.json();
+      movementsCache = data;
       setMovements(data);
     } catch (error) {
       console.error("Failed to fetch movements", error);
@@ -26,21 +33,32 @@ export default function MovementsPage() {
   const handleMovementCreated = (optimistic: Movement) => {
     // Show the new movement instantly (optimistic update)
     setMovements((prev) => [optimistic, ...prev]);
-    // Re-fetch in background to get the real data with userName, correct id, etc.
-    fetchMovements();
+    // Re-fetch silently in background to get real data (userName, id, etc.)
+    fetchMovements({ silent: true });
+  };
+
+  const handleMovementsChange = (updated: Movement[]) => {
+    movementsCache = updated;
+    setMovements(updated);
   };
 
   useEffect(() => {
-    fetchMovements();
+    if (movementsCache !== null) {
+      // Data already cached — refresh silently in background, no spinner
+      fetchMovements({ silent: true });
+    } else {
+      // First visit — fetch and show spinner
+      fetchMovements();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
 
   return (
     <Layout>
       <div className="space-y-8">
         {/* Page Title & CTA */}
-        <PageHeader 
-          title="Movimientos Financieros" 
+        <PageHeader
+          title="Movimientos Financieros"
           description="Administra tus flujos de caja de forma eficiente."
         >
           <NewMovementDialog onMovementCreated={handleMovementCreated}>
@@ -55,7 +73,11 @@ export default function MovementsPage() {
         <MovementsSummary movements={movements} />
 
         {/* Table Component */}
-        <MovementsTable movements={movements} isLoading={isLoading} />
+        <MovementsTable
+          movements={movements}
+          isLoading={isLoading}
+          onMovementsChange={handleMovementsChange}
+        />
       </div>
     </Layout>
   );

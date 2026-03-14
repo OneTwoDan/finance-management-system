@@ -8,6 +8,7 @@ import { Movement } from "@/types";
 
 export default function MovementsPage() {
   const [movements, setMovements] = useState<Movement[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchMovements = async () => {
     try {
@@ -17,7 +18,16 @@ export default function MovementsPage() {
       setMovements(data);
     } catch (error) {
       console.error("Failed to fetch movements", error);
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleMovementCreated = (optimistic: Movement) => {
+    // Show the new movement instantly (optimistic update)
+    setMovements((prev) => [optimistic, ...prev]);
+    // Re-fetch in background to get the real data with userName, correct id, etc.
+    fetchMovements();
   };
 
   useEffect(() => {
@@ -33,7 +43,7 @@ export default function MovementsPage() {
           title="Movimientos Financieros" 
           description="Administra tus flujos de caja de forma eficiente."
         >
-          <NewMovementDialog onMovementCreated={fetchMovements}>
+          <NewMovementDialog onMovementCreated={handleMovementCreated}>
             <button className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-lg font-bold text-sm transition-all shadow-lg shadow-primary/20">
               <span className="material-symbols-outlined text-[18px]">add_circle</span>
               Nuevo Movimiento
@@ -45,7 +55,7 @@ export default function MovementsPage() {
         <MovementsSummary movements={movements} />
 
         {/* Table Component */}
-        <MovementsTable movements={movements} />
+        <MovementsTable movements={movements} isLoading={isLoading} />
       </div>
     </Layout>
   );

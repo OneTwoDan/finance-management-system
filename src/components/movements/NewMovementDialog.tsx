@@ -10,10 +10,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ReactNode, useState } from "react";
+import { Movement } from "@/types";
 
 export interface NewMovementDialogProps {
   children: ReactNode;
-  onMovementCreated?: () => void;
+  onMovementCreated?: (optimistic: Movement) => void;
 }
 
 export function NewMovementDialog({ children, onMovementCreated }: NewMovementDialogProps) {
@@ -39,15 +40,25 @@ export function NewMovementDialog({ children, onMovementCreated }: NewMovementDi
       const parsedAmount = parseFloat(amount);
       const finalAmount = type === "INGRESO" ? Math.abs(parsedAmount) : -Math.abs(parsedAmount);
 
+      // Build an optimistic movement to show instantly in the UI
+      const optimistic: Movement = {
+        id: `optimistic-${Date.now()}`,
+        concept,
+        amount: finalAmount,
+        date: new Date(date).toISOString(),
+        userId: "",
+        createdAt: new Date().toISOString(),
+      };
+
+      if (onMovementCreated) {
+        onMovementCreated(optimistic);
+      }
+
       await fetch("/api/movements", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ concept, amount: finalAmount, date }),
       });
-
-      if (onMovementCreated) {
-        onMovementCreated();
-      }
     } finally {
       setIsSubmitting(false);
     }

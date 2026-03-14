@@ -11,6 +11,9 @@ export class MovementRepository {
       orderBy: {
         date: "desc",
       },
+      include: {
+        user: true,
+      },
     });
   }
 

@@ -15,6 +15,7 @@ export interface Movement {
   amount: number;
   date: string;
   userId: string;
+  userName?: string;
   createdAt: string;
 }
 

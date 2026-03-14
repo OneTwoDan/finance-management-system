@@ -10,6 +10,7 @@ export class MovementService {
     const movements = await MovementRepository.findAll();
     return movements.map((m) => ({
       ...m,
+      userName: m.user?.name ?? undefined,
       date: m.date.toISOString(),
       createdAt: m.createdAt.toISOString(),
     }));

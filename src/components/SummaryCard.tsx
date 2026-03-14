@@ -7,8 +7,8 @@ export interface SummaryCardProps {
   iconColorClass: string;
   value: string;
   valueColorClass?: string;
-  trend: string;
-  trendColorClass: string;
+  trend?: string;
+  trendColorClass?: string;
 }
 
 export function SummaryCard({
@@ -19,7 +19,7 @@ export function SummaryCard({
   value,
   valueColorClass = "",
   trend,
-  trendColorClass,
+  trendColorClass = "",
 }: SummaryCardProps) {
   return (
     <Card className="rounded-xl shadow-sm border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-0">
@@ -32,7 +32,7 @@ export function SummaryCard({
         </div>
         <div className="flex items-baseline gap-2">
           <span className={`text-2xl font-black ${valueColorClass}`}>{value}</span>
-          <span className={`text-xs font-bold ${trendColorClass}`}>{trend}</span>
+          {trend && <span className={`text-xs font-bold ${trendColorClass}`}>{trend}</span>}
         </div>
       </CardContent>
     </Card>

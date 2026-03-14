@@ -42,7 +42,7 @@ export default function MovementsPage() {
         </PageHeader>
 
         {/* Summary Cards */}
-        <MovementsSummary />
+        <MovementsSummary movements={movements} />
 
         {/* Table Component */}
         <MovementsTable movements={movements} />

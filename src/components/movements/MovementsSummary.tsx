@@ -1,6 +1,25 @@
 import { SummaryCard } from "@/components/SummaryCard";
+import { Movement } from "@/types";
 
-export function MovementsSummary() {
+interface MovementsSummaryProps {
+  movements: Movement[];
+}
+
+function formatCurrency(value: number): string {
+  return value.toLocaleString("es-MX", { style: "currency", currency: "MXN" });
+}
+
+export function MovementsSummary({ movements }: MovementsSummaryProps) {
+  const totalIngresos = movements
+    .filter((m) => m.amount > 0)
+    .reduce((sum, m) => sum + m.amount, 0);
+
+  const totalEgresos = movements
+    .filter((m) => m.amount < 0)
+    .reduce((sum, m) => sum + Math.abs(m.amount), 0);
+
+  const balanceNeto = totalIngresos - totalEgresos;
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       <SummaryCard
@@ -8,8 +27,7 @@ export function MovementsSummary() {
         icon="trending_up"
         iconBgClass="bg-green-100 dark:bg-green-900/30"
         iconColorClass="text-green-600"
-        value="$12,450.00"
-        trend="+12%"
+        value={formatCurrency(totalIngresos)}
         trendColorClass="text-green-600"
       />
 
@@ -18,8 +36,7 @@ export function MovementsSummary() {
         icon="trending_down"
         iconBgClass="bg-red-100 dark:bg-red-900/30"
         iconColorClass="text-red-600"
-        value="$8,200.00"
-        trend="-5%"
+        value={formatCurrency(totalEgresos)}
         trendColorClass="text-red-600"
       />
 
@@ -28,9 +45,8 @@ export function MovementsSummary() {
         icon="account_balance_wallet"
         iconBgClass="bg-primary/10"
         iconColorClass="text-primary"
-        value="$4,250.00"
-        valueColorClass="text-primary"
-        trend="+7%"
+        value={formatCurrency(balanceNeto)}
+        valueColorClass={balanceNeto >= 0 ? "text-green-600" : "text-red-600"}
         trendColorClass="text-primary"
       />
     </div>

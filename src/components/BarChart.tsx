@@ -26,7 +26,7 @@ export function BarChart({ data, yAxisLabels, className }: BarChartProps) {
 
       {/* Bars */}
       {data.map((item, idx) => (
-        <div key={idx} className="flex-1 flex flex-col items-center gap-2 group">
+        <div key={idx} className="flex-1 flex flex-col items-center gap-2 group h-full justify-end">
           <div 
             className={cn("w-full rounded-t-lg transition-all duration-300 relative", item.colorClass)} 
             style={{ height: item.height }}

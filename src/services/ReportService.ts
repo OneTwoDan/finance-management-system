@@ -11,13 +11,13 @@ export class ReportService {
       incomeThisMonth: 45200.0,
       expensesThisMonth: 12850.0,
       movementsSummary: [
-        { day: "Lun", amount: 15000 },
-        { day: "Mar", amount: 35000 },
-        { day: "Mie", amount: 25000 },
-        { day: "Jue", amount: 15000 },
-        { day: "Vie", amount: 42000 },
-        { day: "Sab", amount: 20000 },
-        { day: "Dom", amount: 28000 },
+        { day: "Lun", amount: 22000 },
+        { day: "Mar", amount: 18000 },
+        { day: "Mie", amount: 40000 },
+        { day: "Jue", amount: 30000 },
+        { day: "Vie", amount: 25000 },
+        { day: "Sab", amount: 35000 },
+        { day: "Dom", amount: 10000 },
       ],
     };
   }

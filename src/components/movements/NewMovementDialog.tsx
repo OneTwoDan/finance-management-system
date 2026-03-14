@@ -22,27 +22,34 @@ export function NewMovementDialog({ children, onMovementCreated }: NewMovementDi
   const [amount, setAmount] = useState("");
   const [date, setDate] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!concept || !amount || !date) return;
+    if (!concept || !amount || !date || isSubmitting) return;
 
-    const parsedAmount = parseFloat(amount);
-    const finalAmount = type === "INGRESO" ? Math.abs(parsedAmount) : -Math.abs(parsedAmount);
-
-    await fetch("/api/movements", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ concept, amount: finalAmount, date }),
-    });
-
+    setIsSubmitting(true);
+    // Close and reset the modal immediately to prevent duplicate submissions
+    setIsOpen(false);
     setConcept("");
     setAmount("");
     setDate("");
-    setIsOpen(false);
-    
-    if (onMovementCreated) {
-      onMovementCreated();
+
+    try {
+      const parsedAmount = parseFloat(amount);
+      const finalAmount = type === "INGRESO" ? Math.abs(parsedAmount) : -Math.abs(parsedAmount);
+
+      await fetch("/api/movements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ concept, amount: finalAmount, date }),
+      });
+
+      if (onMovementCreated) {
+        onMovementCreated();
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -136,7 +143,7 @@ export function NewMovementDialog({ children, onMovementCreated }: NewMovementDi
                   onClick={() => setType("INGRESO")}
                   className={`flex items-center justify-center gap-2 h-10 rounded-lg border-2 text-xs font-bold transition-all ${
                     type === "INGRESO"
-                      ? "border-primary bg-primary/5 text-primary"
+                      ? "border-green-500 bg-green-50 dark:bg-green-900/20 text-green-600"
                       : "border-transparent bg-slate-100 dark:bg-slate-900 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800"
                   }`}
                 >
@@ -148,7 +155,7 @@ export function NewMovementDialog({ children, onMovementCreated }: NewMovementDi
                   onClick={() => setType("EGRESO")}
                   className={`flex items-center justify-center gap-2 h-10 rounded-lg border-2 text-xs font-bold transition-all ${
                     type === "EGRESO"
-                      ? "border-primary bg-primary/5 text-primary"
+                      ? "border-red-500 bg-red-50 dark:bg-red-900/20 text-red-600"
                       : "border-transparent bg-slate-100 dark:bg-slate-900 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800"
                   }`}
                 >
@@ -160,9 +167,13 @@ export function NewMovementDialog({ children, onMovementCreated }: NewMovementDi
           </div>
 
           <div className="flex flex-col gap-3 pt-4">
-            <Button className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2" type="submit">
+            <Button
+              className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-bold rounded-lg transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+              type="submit"
+              disabled={isSubmitting}
+            >
               <span className="material-symbols-outlined text-xl">add_circle</span>
-              Ingresar Movimiento
+              {isSubmitting ? "Guardando..." : "Ingresar Movimiento"}
             </Button>
             <DialogClose render={<Button type="button" variant="ghost" className="w-full h-10 flex items-center justify-center text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 text-sm font-medium transition-colors hover:bg-transparent">Cancelar</Button>} />
           </div>

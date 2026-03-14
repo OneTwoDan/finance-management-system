@@ -1,10 +1,38 @@
+import { useEffect, useState } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { PageHeader } from "@/components/PageHeader";
 import { ReportsSummaryCards } from "@/components/reports/ReportsSummaryCards";
 import { ReportsChart } from "@/components/reports/ReportsChart";
 import { ReportsRecentActivity } from "@/components/reports/ReportsRecentActivity";
+import { MovementService } from "@/services/MovementService";
+import { ReportService } from "@/services/ReportService";
+import { Movement, ReportSummary } from "@/types";
 
 export default function ReportsPage() {
+  const [reportSummary, setReportSummary] = useState<ReportSummary | null>(null);
+  const [movements, setMovements] = useState<Movement[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const [summaryData, movementsData] = await Promise.all([
+          ReportService.getReportSummary(),
+          MovementService.getMovements(),
+        ]);
+        setReportSummary(summaryData);
+        setMovements(movementsData);
+      } catch (error) {
+        console.error("Failed to fetch report data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const headerActions = (
     <button className="hidden sm:flex items-center gap-2 px-3 py-1.5 text-sm font-medium border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors ml-2">
       <span className="material-symbols-outlined !text-lg">download</span>
@@ -26,9 +54,21 @@ export default function ReportsPage() {
           </div>
         </PageHeader>
 
-        <ReportsSummaryCards />
-        <ReportsChart />
-        <ReportsRecentActivity />
+        {isLoading ? (
+          <div className="py-20 text-center text-slate-500">Cargando reportes...</div>
+        ) : reportSummary ? (
+          <>
+            <ReportsSummaryCards 
+              currentBalance={reportSummary.currentBalance}
+              incomeThisMonth={reportSummary.incomeThisMonth}
+              expensesThisMonth={reportSummary.expensesThisMonth}
+            />
+            <ReportsChart data={reportSummary.movementsSummary} />
+            <ReportsRecentActivity movements={movements} />
+          </>
+        ) : (
+          <div className="py-20 text-center text-red-500">Error al cargar los datos.</div>
+        )}
       </div>
     </Layout>
   );

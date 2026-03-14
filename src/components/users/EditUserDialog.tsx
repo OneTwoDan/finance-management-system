@@ -19,27 +19,39 @@ import { Switch } from "@/components/ui/switch";
 import { IconInput } from "@/components/IconInput";
 import { InfoCard } from "@/components/InfoCard";
 import Link from "next/link";
-import { FormEvent, ReactNode } from "react";
+import { FormEvent, ReactNode, useState } from "react";
+import { User, Role } from "@/types";
+import { UserService } from "@/services/UserService";
 
 export interface EditUserDialogProps {
   children: ReactNode;
-  defaultName?: string;
-  defaultEmail?: string;
-  defaultRole?: string;
+  user: User;
+  onUserUpdated?: () => void;
 }
 
-export function EditUserDialog({ 
-  children, 
-  defaultName = "Juan Pérez", 
-  defaultEmail = "juan.perez@example.com",
-  defaultRole = "viewer" 
-}: EditUserDialogProps) {
-  const handleSubmit = (e: FormEvent) => {
+export function EditUserDialog({ children, user, onUserUpdated }: EditUserDialogProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [name, setName] = useState(user.name);
+  const [role, setRole] = useState<Role>(user.role);
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!name || !role) return;
+
+    await UserService.updateUser(user.id, {
+      name,
+      role
+    });
+
+    setIsOpen(false);
+    
+    if (onUserUpdated) {
+      onUserUpdated();
+    }
   };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger render={typeof children === 'string' ? undefined : (children as any)}>
         {typeof children === 'string' ? children : undefined}
       </DialogTrigger>
@@ -67,7 +79,9 @@ export function EditUserDialog({
                   type="text"
                   label="Nombre Completo"
                   icon="person"
-                  defaultValue={defaultName}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
                 />
 
                 {/* Field: Email */}
@@ -77,31 +91,29 @@ export function EditUserDialog({
                   type="email"
                   label="Correo Electrónico"
                   icon="mail"
-                  defaultValue={defaultEmail}
+                  defaultValue={user.email}
                   disabled
                   className="bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 cursor-not-allowed"
                 />
 
                 {/* Field: Rol */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300" htmlFor="rol">
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                     Rol de Usuario
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 z-10">
                       <span className="material-symbols-outlined text-lg">verified_user</span>
                     </div>
-                    <Select defaultValue={defaultRole} name="rol">
+                    <Select value={role} onValueChange={(val) => setRole(val as Role)}>
                       <SelectTrigger
-                        id="rol"
                         className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all sm:text-sm h-auto [&>svg]:hidden relative"
                       >
                         <SelectValue placeholder="Seleccionar rol" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="admin">Administrador</SelectItem>
-                        <SelectItem value="editor">Editor</SelectItem>
-                        <SelectItem value="viewer">Lector (Viewer)</SelectItem>
+                        <SelectItem value="ADMIN">Administrador</SelectItem>
+                        <SelectItem value="USER">Usuario</SelectItem>
                       </SelectContent>
                     </Select>
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
@@ -109,7 +121,7 @@ export function EditUserDialog({
                     </div>
                   </div>
                   <p className="text-xs text-slate-500 mt-1.5">
-                    Los editores pueden gestionar transacciones pero no configuraciones globales.
+                    Para propósitos de prueba de la arquitectura todos tienen roles ADMIN o USER.
                   </p>
                 </div>
 

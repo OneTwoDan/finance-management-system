@@ -2,12 +2,20 @@ import { MetricCard } from "@/components/MetricCard";
 import { TrendBadge } from "@/components/TrendBadge";
 import { Progress } from "@/components/ui/progress";
 
-export function ReportsSummaryCards() {
+export interface ReportsSummaryCardsProps {
+  currentBalance: number;
+  incomeThisMonth: number;
+  expensesThisMonth: number;
+}
+
+export function ReportsSummaryCards({ currentBalance, incomeThisMonth, expensesThisMonth }: ReportsSummaryCardsProps) {
+  const formatMoney = (val: number) => `$${val.toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       <MetricCard
         title="Saldo Actual"
-        value="$125,430.00"
+        value={formatMoney(currentBalance)}
         prominent
         icon="account_balance_wallet"
         className="md:col-span-1"
@@ -21,7 +29,7 @@ export function ReportsSummaryCards() {
 
       <MetricCard
         title="Ingresos del Mes"
-        value="$45,200.00"
+        value={formatMoney(incomeThisMonth)}
         footer={
           <>
             <Progress value={70} className="w-full h-1.5 [&>div]:bg-primary bg-slate-100 dark:bg-slate-800" />
@@ -32,7 +40,7 @@ export function ReportsSummaryCards() {
 
       <MetricCard
         title="Gastos Operativos"
-        value="$12,850.00"
+        value={formatMoney(expensesThisMonth)}
         footer={
           <div className="flex items-center gap-2">
             <TrendBadge trend="flat" value="Estable" />

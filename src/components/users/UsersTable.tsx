@@ -8,43 +8,23 @@ import {
 } from "@/components/ui/table";
 import { EditUserDialog } from "@/components/users/EditUserDialog";
 import { TablePagination } from "@/components/TablePagination";
+import { User } from "@/types";
 
-const mockUsers = [
-  {
-    id: 1,
-    initials: "JP",
-    name: "Juan Pérez",
-    email: "juan.perez@example.com",
-    phone: "+34 600 000 001",
-    role: "viewer"
-  },
-  {
-    id: 2,
-    initials: "MG",
-    name: "María García",
-    email: "maria.g@example.com",
-    phone: "+34 600 000 002",
-    role: "editor"
-  },
-  {
-    id: 3,
-    initials: "CR",
-    name: "Carlos Ruiz",
-    email: "c.ruiz@example.com",
-    phone: "+34 600 000 003",
-    role: "admin"
-  },
-  {
-    id: 4,
-    initials: "AL",
-    name: "Ana López",
-    email: "ana.l@example.com",
-    phone: "+34 600 000 004",
-    role: "support"
-  },
-];
+export interface UsersTableProps {
+  users: User[];
+  onUserUpdated?: () => void;
+}
 
-export function UsersTable() {
+export function UsersTable({ users, onUserUpdated }: UsersTableProps) {
+  // Helper to extract initials
+  const getInitials = (name: string) => {
+    return name.split(" ")
+      .map(n => n[0])
+      .join("")
+      .substring(0, 2)
+      .toUpperCase();
+  };
+
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
       <div className="overflow-x-auto">
@@ -58,12 +38,12 @@ export function UsersTable() {
             </TableRow>
           </TableHeader>
           <TableBody className="divide-y divide-slate-100 dark:divide-slate-800">
-            {mockUsers.map((user) => (
+            {users.map((user) => (
               <TableRow key={user.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors border-0">
                 <TableCell className="px-6 py-4">
                   <div className="flex items-center gap-3">
                     <div className="size-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 font-medium text-xs">
-                      {user.initials}
+                      {getInitials(user.name)}
                     </div>
                     <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">{user.name}</span>
                   </div>
@@ -75,7 +55,7 @@ export function UsersTable() {
                   {user.phone}
                 </TableCell>
                 <TableCell className="px-6 py-4 text-right">
-                  <EditUserDialog defaultName={user.name} defaultRole={user.role} defaultEmail={user.email}>
+                  <EditUserDialog user={user} onUserUpdated={onUserUpdated}>
                     <button className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline">
                       <span className="material-symbols-outlined text-[16px]">edit</span>
                       Editar
@@ -84,12 +64,19 @@ export function UsersTable() {
                 </TableCell>
               </TableRow>
             ))}
+            {users.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={4} className="px-6 py-8 text-center text-slate-500">
+                  No hay usuarios registrados.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
       <TablePagination
-        currentCount={mockUsers.length}
-        totalCount={24}
+        currentCount={users.length}
+        totalCount={users.length}
         label="usuarios"
         variant="text"
       />

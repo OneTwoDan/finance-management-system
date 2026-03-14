@@ -1,8 +1,26 @@
+import { useEffect, useState } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { PageHeader } from "@/components/PageHeader";
 import { UsersTable } from "@/components/users/UsersTable";
+import { UserService } from "@/services/UserService";
+import { User } from "@/types";
 
 export default function UsersPage() {
+  const [users, setUsers] = useState<User[]>([]);
+
+  const fetchUsers = async () => {
+    try {
+      const data = await UserService.getUsers();
+      setUsers(data);
+    } catch (error) {
+      console.error("Failed to fetch users", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
   return (
     <Layout>
       <div className="max-w-6xl mx-auto space-y-8">
@@ -16,7 +34,7 @@ export default function UsersPage() {
           </button>
         </PageHeader>
         
-        <UsersTable />
+        <UsersTable users={users} onUserUpdated={fetchUsers} />
       </div>
     </Layout>
   );

@@ -10,12 +10,46 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ReactNode, useState } from "react";
+import { MovementService } from "@/services/MovementService";
 
-export function NewMovementDialog({ children }: { children: ReactNode }) {
+export interface NewMovementDialogProps {
+  children: ReactNode;
+  onMovementCreated?: () => void;
+}
+
+export function NewMovementDialog({ children, onMovementCreated }: NewMovementDialogProps) {
   const [type, setType] = useState<"INGRESO" | "EGRESO">("INGRESO");
+  const [concept, setConcept] = useState("");
+  const [amount, setAmount] = useState("");
+  const [date, setDate] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!concept || !amount || !date) return;
+
+    const parsedAmount = parseFloat(amount);
+    const finalAmount = type === "INGRESO" ? Math.abs(parsedAmount) : -Math.abs(parsedAmount);
+
+    await MovementService.createMovement({
+      concept,
+      amount: finalAmount,
+      date,
+      userId: "1", // Hardcoded mock user ID
+    });
+
+    setConcept("");
+    setAmount("");
+    setDate("");
+    setIsOpen(false);
+    
+    if (onMovementCreated) {
+      onMovementCreated();
+    }
+  };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger render={typeof children === 'string' ? undefined : (children as any)}>
         {typeof children === 'string' ? children : undefined}
       </DialogTrigger>
@@ -28,7 +62,7 @@ export function NewMovementDialog({ children }: { children: ReactNode }) {
           <DialogClose render={<button type="button" className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"><span className="material-symbols-outlined">close</span></button>} />
         </DialogHeader>
 
-        <form className="p-8 space-y-6">
+        <form className="p-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             {/* Concepto Field */}
             <div className="space-y-2">
@@ -41,6 +75,9 @@ export function NewMovementDialog({ children }: { children: ReactNode }) {
                   className="w-full h-12 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 text-sm focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary transition-all placeholder:text-slate-400"
                   placeholder="Ej. Pago de servicios mensual"
                   type="text"
+                  value={concept}
+                  onChange={(e) => setConcept(e.target.value)}
+                  required
                 />
               </div>
             </div>
@@ -61,6 +98,9 @@ export function NewMovementDialog({ children }: { children: ReactNode }) {
                     placeholder="0.00"
                     type="number"
                     step="0.01"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    required
                   />
                 </div>
               </div>
@@ -78,7 +118,9 @@ export function NewMovementDialog({ children }: { children: ReactNode }) {
                     id="fecha"
                     className="w-full h-12 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 pr-10 text-sm focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary transition-all appearance-none [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:w-full"
                     type="date"
-                    defaultValue="2023-10-27"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    required
                   />
                 </div>
               </div>

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { PageHeader } from "@/components/PageHeader";
 import { UsersTable } from "@/components/users/UsersTable";
-import { UserService } from "@/services/UserService";
 import { User } from "@/types";
 
 export default function UsersPage() {
@@ -10,7 +9,9 @@ export default function UsersPage() {
 
   const fetchUsers = async () => {
     try {
-      const data = await UserService.getUsers();
+      const res = await fetch("/api/users");
+      if (!res.ok) throw new Error("Failed to fetch");
+      const data = await res.json();
       setUsers(data);
     } catch (error) {
       console.error("Failed to fetch users", error);
@@ -20,6 +21,7 @@ export default function UsersPage() {
   useEffect(() => {
     fetchUsers();
   }, []);
+
 
   return (
     <Layout>

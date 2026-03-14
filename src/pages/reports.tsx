@@ -4,8 +4,6 @@ import { PageHeader } from "@/components/PageHeader";
 import { ReportsSummaryCards } from "@/components/reports/ReportsSummaryCards";
 import { ReportsChart } from "@/components/reports/ReportsChart";
 import { ReportsRecentActivity } from "@/components/reports/ReportsRecentActivity";
-import { MovementService } from "@/services/MovementService";
-import { ReportService } from "@/services/ReportService";
 import { Movement, ReportSummary } from "@/types";
 
 export default function ReportsPage() {
@@ -17,10 +15,12 @@ export default function ReportsPage() {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const [summaryData, movementsData] = await Promise.all([
-          ReportService.getReportSummary(),
-          MovementService.getMovements(),
+        const [summaryRes, movementsRes] = await Promise.all([
+          fetch("/api/reports"),
+          fetch("/api/movements"),
         ]);
+        const summaryData = await summaryRes.json();
+        const movementsData = await movementsRes.json();
         setReportSummary(summaryData);
         setMovements(movementsData);
       } catch (error) {
@@ -33,8 +33,30 @@ export default function ReportsPage() {
     fetchData();
   }, []);
 
+
+  const handleDownloadCsv = async () => {
+    try {
+      const response = await fetch("/api/reports/csv");
+      if (!response.ok) throw new Error("Failed to download CSV");
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `movements-${new Date().toISOString().split("T")[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Failed to download CSV:", error);
+    }
+  };
+
   const headerActions = (
-    <button className="hidden sm:flex items-center gap-2 px-3 py-1.5 text-sm font-medium border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors ml-2">
+    <button
+      onClick={handleDownloadCsv}
+      className="hidden sm:flex items-center gap-2 px-3 py-1.5 text-sm font-medium border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors ml-2"
+    >
       <span className="material-symbols-outlined !text-lg">download</span>
       Descargar CSV
     </button>

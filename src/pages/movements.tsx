@@ -4,7 +4,6 @@ import { MovementsSummary } from "@/components/movements/MovementsSummary";
 import { MovementsTable } from "@/components/movements/MovementsTable";
 import { NewMovementDialog } from "@/components/movements/NewMovementDialog";
 import { PageHeader } from "@/components/PageHeader";
-import { MovementService } from "@/services/MovementService";
 import { Movement } from "@/types";
 
 export default function MovementsPage() {
@@ -12,7 +11,9 @@ export default function MovementsPage() {
 
   const fetchMovements = async () => {
     try {
-      const data = await MovementService.getMovements();
+      const res = await fetch("/api/movements");
+      if (!res.ok) throw new Error("Failed to fetch");
+      const data = await res.json();
       setMovements(data);
     } catch (error) {
       console.error("Failed to fetch movements", error);
@@ -22,6 +23,7 @@ export default function MovementsPage() {
   useEffect(() => {
     fetchMovements();
   }, []);
+
 
   return (
     <Layout>

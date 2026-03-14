@@ -10,7 +10,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ReactNode, useState } from "react";
-import { MovementService } from "@/services/MovementService";
 
 export interface NewMovementDialogProps {
   children: ReactNode;
@@ -31,11 +30,10 @@ export function NewMovementDialog({ children, onMovementCreated }: NewMovementDi
     const parsedAmount = parseFloat(amount);
     const finalAmount = type === "INGRESO" ? Math.abs(parsedAmount) : -Math.abs(parsedAmount);
 
-    await MovementService.createMovement({
-      concept,
-      amount: finalAmount,
-      date,
-      userId: "1", // Hardcoded mock user ID
+    await fetch("/api/movements", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ concept, amount: finalAmount, date }),
     });
 
     setConcept("");
@@ -47,6 +45,7 @@ export function NewMovementDialog({ children, onMovementCreated }: NewMovementDi
       onMovementCreated();
     }
   };
+
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

@@ -1,7 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { UserService } from "@/services/UserService";
+import { withAuth } from "@/utils/middleware";
+import { Role } from "@prisma/client";
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
@@ -18,3 +20,5 @@ export default async function handler(
   res.setHeader("Allow", ["GET"]);
   return res.status(405).end(`Method ${req.method} Not Allowed`);
 }
+
+export default withAuth(handler, [Role.ADMIN]);

@@ -1,7 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { UserService } from "@/services/UserService";
+import { withAuth } from "@/utils/middleware";
+import { Role } from "@prisma/client";
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
@@ -9,8 +11,8 @@ export default async function handler(
 
   if (req.method === "PATCH") {
     try {
-      const userId = Number(id);
-      if (isNaN(userId)) {
+      const userId = String(id);
+      if (!userId) {
         return res.status(400).json({ error: "Invalid user ID" });
       }
 
@@ -25,3 +27,5 @@ export default async function handler(
   res.setHeader("Allow", ["PATCH"]);
   return res.status(405).end(`Method ${req.method} Not Allowed`);
 }
+
+export default withAuth(handler, [Role.ADMIN]);

@@ -17,42 +17,44 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { IconInput } from "@/components/IconInput";
-import { InfoCard } from "@/components/InfoCard";
-import Link from "next/link";
 import { FormEvent, ReactNode, useState } from "react";
 import { User, Role } from "@/types";
 
-export interface EditUserDialogProps {
+export interface NewUserDialogProps {
   children: ReactNode;
-  user: User;
-  onUserUpdated?: (updatedUser: User) => void;
+  onUserCreated?: (user: User) => void;
 }
 
-export function EditUserDialog({ children, user, onUserUpdated }: EditUserDialogProps) {
+export function NewUserDialog({ children, onUserCreated }: NewUserDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [name, setName] = useState(user.name);
-  const [phone, setPhone] = useState(user.phone || "");
-  const [role, setRole] = useState<Role>(user.role);
-  const [isActive, setIsActive] = useState(user.isActive !== false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [role, setRole] = useState<Role>("USER");
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!name || !role || isSubmitting) return;
+    if (!name || !email || !role || isSubmitting) return;
 
     setIsSubmitting(true);
+    let newUser: any = null;
     try {
-      const res = await fetch(`/api/users/${user.id}`, {
-        method: "PATCH",
+      const res = await fetch(`/api/users`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name, phone, role, isActive }),
+        body: JSON.stringify({ name, email, phone, role }),
       });
 
       if (!res.ok) {
-        throw new Error("Failed to update user");
+        const data = await res.json();
+        alert(data.error || "Failed to create user");
+        setIsSubmitting(false);
+        return;
       }
+      newUser = await res.json();
     } catch (error) {
       console.error(error);
       setIsSubmitting(false);
@@ -62,8 +64,14 @@ export function EditUserDialog({ children, user, onUserUpdated }: EditUserDialog
     setIsSubmitting(false);
     setIsOpen(false);
     
-    if (onUserUpdated) {
-      onUserUpdated({ ...user, name, phone, role, isActive });
+    // Clear form
+    setName("");
+    setEmail("");
+    setPhone("");
+    setRole("USER");
+
+    if (onUserCreated && newUser) {
+      onUserCreated(newUser);
     }
   };
 
@@ -74,9 +82,9 @@ export function EditUserDialog({ children, user, onUserUpdated }: EditUserDialog
       </DialogTrigger>
       <DialogContent className="sm:max-w-3xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-2xl p-0 rounded-xl overflow-hidden [&>button]:top-6 [&>button]:right-6 [&>button]:text-slate-400 [&>button:hover]:text-slate-600 dark:[&>button:hover]:text-slate-200 gap-0">
         <DialogHeader className="p-8 border-b border-slate-100 dark:border-slate-800 text-left space-y-0 relative">
-          <DialogTitle className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Editar Usuario</DialogTitle>
+          <DialogTitle className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Nuevo Usuario</DialogTitle>
           <DialogDescription className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Modifica los detalles y permisos del usuario en la plataforma.
+            Agrega un nuevo usuario y configura sus permisos en la plataforma.
           </DialogDescription>
         </DialogHeader>
 
@@ -85,7 +93,7 @@ export function EditUserDialog({ children, user, onUserUpdated }: EditUserDialog
           <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             <div className="p-6 border-b border-slate-100 dark:border-slate-800">
               <h3 className="font-semibold text-lg">Información Personal</h3>
-              <p className="text-sm text-slate-500">Actualiza los datos básicos de acceso.</p>
+              <p className="text-sm text-slate-500">Datos básicos de acceso.</p>
             </div>
             <form className="p-6 space-y-6" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -108,9 +116,9 @@ export function EditUserDialog({ children, user, onUserUpdated }: EditUserDialog
                   type="email"
                   label="Correo Electrónico"
                   icon="mail"
-                  defaultValue={user.email}
-                  disabled
-                  className="bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-400 cursor-not-allowed"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
                 />
 
                 {/* Field: Teléfono */}
@@ -155,26 +163,14 @@ export function EditUserDialog({ children, user, onUserUpdated }: EditUserDialog
 
                 {/* Field: Estado */}
                 <div className="space-y-2">
-                  <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-                    <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Estado de la cuenta</h4>
-                    
-                    <div className="flex items-center justify-between p-4 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                      <div className="space-y-1">
-                      <label htmlFor="active-status" className="block text-sm font-medium text-slate-900 dark:text-slate-100">
-                        Cuenta activa
-                      </label>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
-                        Los usuarios inactivos no pueden acceder a la plataforma.
-                      </p>
-                    </div>
-                      <div className="flex items-center space-x-2">
-                        <Switch 
-                            id="active-status"
-                            checked={isActive}
-                            onCheckedChange={setIsActive}
-                          />
-                      </div>
-                    </div>
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300" htmlFor="estado">
+                    Estado de la cuenta
+                  </label>
+                  <div className="flex items-center gap-3 h-[42px]">
+                    <Switch id="estado" defaultChecked />
+                    <label className="text-sm font-medium text-slate-600 dark:text-slate-400 cursor-pointer" htmlFor="estado">
+                      Activo
+                    </label>
                   </div>
                 </div>
               </div>
@@ -190,10 +186,10 @@ export function EditUserDialog({ children, user, onUserUpdated }: EditUserDialog
                   {isSubmitting ? (
                     <>
                       <div className="size-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Guardando...
+                      Creando...
                     </>
                   ) : (
-                    "Guardar Cambios"
+                    "Crear Usuario"
                   )}
                 </Button>
               </div>

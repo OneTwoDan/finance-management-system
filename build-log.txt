@@ -1,0 +1,23 @@
+
+> finance-management-system@0.1.0 build
+> next build
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Running TypeScript ...
+Failed to compile.
+
+./src/pages/users.tsx:59:11
+Type error: Type '{ users: User[]; onUserUpdated: (updatedUser: User) => void; onUserDeleted: (deletedId: string) => void; }' is not assignable to type 'IntrinsicAttributes & UsersTableProps'.
+  Property 'onUserDeleted' does not exist on type 'IntrinsicAttributes & UsersTableProps'.
+
+[0m [90m 57 |[39m           users[33m=[39m{users} 
+ [90m 58 |[39m           onUserUpdated[33m=[39m{handleUserUpdated} 
+[31m[1m>[22m[39m[90m 59 |[39m           onUserDeleted[33m=[39m{handleUserDeleted}
+ [90m    |[39m           [31m[1m^[22m[39m
+ [90m 60 |[39m         [33m/[39m[33m>[39m
+ [90m 61 |[39m       [33m<[39m[33m/[39m[33mdiv[39m[33m>[39m
+ [90m 62 |[39m     [33m<[39m[33m/[39m[33mLayout[39m[33m>[39m[0m
+Next.js build worker exited with code: 1 and signal: null

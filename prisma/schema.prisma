@@ -18,6 +18,7 @@ model User {
   name          String
   email         String     @unique
   phone         String?
+  isActive      Boolean    @default(true)
   role          Role       @default(USER)
   emailVerified Boolean?
   image         String?

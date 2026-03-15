@@ -12,7 +12,7 @@ import { User } from "@/types";
 
 export interface UsersTableProps {
   users: User[];
-  onUserUpdated?: () => void;
+  onUserUpdated?: (updatedUser: User) => void;
 }
 
 export function UsersTable({ users, onUserUpdated }: UsersTableProps) {
@@ -33,6 +33,7 @@ export function UsersTable({ users, onUserUpdated }: UsersTableProps) {
             <TableRow className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/50">
               <TableHead className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 h-auto">Nombre</TableHead>
               <TableHead className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 h-auto">Correo</TableHead>
+              <TableHead className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 h-auto">Estado</TableHead>
               <TableHead className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 h-auto">Teléfono</TableHead>
               <TableHead className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right h-auto">Acciones</TableHead>
             </TableRow>
@@ -51,16 +52,29 @@ export function UsersTable({ users, onUserUpdated }: UsersTableProps) {
                 <TableCell className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400 font-medium">
                   {user.email}
                 </TableCell>
+                <TableCell className="px-6 py-4 text-sm">
+                  {user.isActive !== false ? (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                      Activo
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300">
+                      Inactivo
+                    </span>
+                  )}
+                </TableCell>
                 <TableCell className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
                   {user.phone}
                 </TableCell>
                 <TableCell className="px-6 py-4 text-right">
-                  <EditUserDialog user={user} onUserUpdated={onUserUpdated}>
-                    <button className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline">
-                      <span className="material-symbols-outlined text-[16px]">edit</span>
-                      Editar
-                    </button>
-                  </EditUserDialog>
+                  <div className="flex items-center justify-end gap-3">
+                    <EditUserDialog user={user} onUserUpdated={onUserUpdated}>
+                      <button className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline">
+                        <span className="material-symbols-outlined text-[16px]">edit</span>
+                        Editar
+                      </button>
+                    </EditUserDialog>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

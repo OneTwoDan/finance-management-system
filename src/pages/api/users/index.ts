@@ -57,8 +57,24 @@ async function handler(
     }
   }
 
+  if (req.method === "POST") {
+    try {
+      const { name, email, phone, role } = req.body;
+      if (!name || !email) {
+        return res.status(400).json({ error: "Name and email are required" });
+      }
+      const user = await UserService.createUser({ name, email, phone, role });
+      if (!user) {
+        return res.status(400).json({ error: "Failed to create user (maybe email already in use)" });
+      }
+      return res.status(201).json(user);
+    } catch (error) {
+      return res.status(500).json({ error: "Failed to create user" });
+    }
+  }
+
   // Handle any other HTTP method
-  res.setHeader("Allow", ["GET"]);
+  res.setHeader("Allow", ["GET", "POST"]);
   return res.status(405).end(`Method ${req.method} Not Allowed`);
 }
 

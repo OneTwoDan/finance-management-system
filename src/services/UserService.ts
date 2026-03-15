@@ -12,6 +12,7 @@ export class UserService {
       ...user,
       createdAt: user.createdAt.toISOString(),
       phone: user.phone || "",
+      isActive: user.isActive !== false,
     })) as User[];
   }
 
@@ -21,7 +22,7 @@ export class UserService {
    */
   static async updateUser(
     id: string,
-    updates: { name?: string; role?: Role }
+    updates: { name?: string; phone?: string; role?: Role; isActive?: boolean }
   ): Promise<User | null> {
     try {
       const updatedUser = await UserRepository.update(id, updates);
@@ -29,9 +30,37 @@ export class UserService {
         ...updatedUser,
         createdAt: updatedUser.createdAt.toISOString(),
         phone: updatedUser.phone || "",
+        isActive: updatedUser.isActive,
       } as User;
     } catch (error) {
       console.error("Failed to update user:", error);
+      return null;
+    }
+  }
+
+  /**
+   * createUser
+   * Creates a new user in the database
+   */
+  static async createUser(
+    data: { name: string; email: string; phone?: string; role?: Role }
+  ): Promise<User | null> {
+    try {
+      const newUser = await UserRepository.create({
+        name: data.name,
+        email: data.email,
+        phone: data.phone || null,
+        role: data.role || "USER",
+        emailVerified: true, // Since created by admin
+      });
+      return {
+        ...newUser,
+        createdAt: newUser.createdAt.toISOString(),
+        phone: newUser.phone || "",
+        isActive: newUser.isActive,
+      } as User;
+    } catch (error) {
+      console.error("Failed to create user:", error);
       return null;
     }
   }

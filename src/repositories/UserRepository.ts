@@ -20,4 +20,24 @@ export class UserRepository {
       data,
     });
   }
+
+  /**
+   * create
+   * Creates a new user
+   */
+  static async create(data: Prisma.UserCreateInput) {
+    return prisma.user.create({
+      data,
+    });
+  }
+
+  /**
+   * delete
+   * Deletes a user by id
+   */
+  static async delete(id: string) {
+    return prisma.user.delete({
+      where: { id },
+    });
+  }
 }

@@ -3,7 +3,6 @@ import { Layout } from "@/components/layout/Layout";
 import { PageHeader } from "@/components/PageHeader";
 import { ReportsSummaryCards } from "@/components/reports/ReportsSummaryCards";
 import { ReportsChart } from "@/components/reports/ReportsChart";
-import { ReportsRecentActivity } from "@/components/reports/ReportsRecentActivity";
 import { ReportSummary } from "@/types";
 
 function LoadingSpinner() {
@@ -93,10 +92,6 @@ export default function ReportsPage() {
               <span className="material-symbols-outlined !text-lg">download</span>
               Descargar CSV
             </button>
-            <div className="flex items-center gap-2 text-sm text-slate-500 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
-              <span className="material-symbols-outlined !text-lg">calendar_today</span>
-              <span>Enero 2024 - Junio 2024</span>
-            </div>
           </div>
         </PageHeader>
 
@@ -106,11 +101,8 @@ export default function ReportsPage() {
           <>
             <ReportsSummaryCards
               currentBalance={reportSummary.currentBalance}
-              incomeThisMonth={reportSummary.incomeThisMonth}
-              expensesThisMonth={reportSummary.expensesThisMonth}
             />
-            <ReportsChart data={reportSummary.movementsSummary} />
-            <ReportsRecentActivity movements={reportSummary.movements} />
+            <ReportsChart data={reportSummary.movementsSummary} movements={reportSummary.movements} />
           </>
         ) : (
           <div className="py-20 text-center text-red-500">Error al cargar los datos.</div>

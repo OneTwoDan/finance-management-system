@@ -1,18 +1,50 @@
+import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BarChart } from "@/components/BarChart";
-import { ReportSummary } from "@/types";
+import { ReportSummary, Movement } from "@/types";
 
 export interface ReportsChartProps {
   data: ReportSummary["movementsSummary"];
+  movements?: Movement[];
 }
 
-export function ReportsChart({ data }: ReportsChartProps) {
+export function ReportsChart({ data, movements = [] }: ReportsChartProps) {
+  const [filter, setFilter] = useState<"week" | "month">("week");
+
+  const monthlyData = useMemo(() => {
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+    
+    let week1 = 0, week2 = 0, week3 = 0, week4 = 0;
+    
+    movements.forEach(m => {
+      const d = new Date(m.date);
+      if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
+        const dayOfMonth = d.getDate();
+        if (dayOfMonth <= 7) week1 += m.amount;
+        else if (dayOfMonth <= 14) week2 += m.amount;
+        else if (dayOfMonth <= 21) week3 += m.amount;
+        else week4 += m.amount;
+      }
+    });
+    
+    return [
+      { day: "Sem 1", amount: week1 },
+      { day: "Sem 2", amount: week2 },
+      { day: "Sem 3", amount: week3 },
+      { day: "Sem 4", amount: week4 }
+    ];
+  }, [movements]);
+
+  const activeData = filter === "week" ? data : monthlyData;
+
   // Find max amount to calculate heights
-  const maxAmount = Math.max(...data.map(d => d.amount), 50000); // minimum 50k scale
+  const maxAmount = Math.max(...activeData.map(d => d.amount), 50000); // minimum 50k scale
 
   // Calculate colors and heights depending on amount relative to maxAmount
-  const mappedChartData = data.map(d => {
+  const mappedChartData = activeData.map(d => {
     const percentage = (d.amount / maxAmount) * 100;
     let colorClass = "bg-primary/20 hover:bg-primary/40";
     
@@ -37,10 +69,18 @@ export function ReportsChart({ data }: ReportsChartProps) {
           <p className="text-sm text-slate-500">Actividad económica semanal detallada</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="ghost" className="px-3 py-1 text-xs font-semibold rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors h-auto">
+          <Button 
+            variant="ghost" 
+            onClick={() => setFilter("week")}
+            className={`px-3 py-1 text-xs font-semibold rounded h-auto transition-colors ${filter === "week" ? "bg-slate-100 dark:bg-slate-800" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`}
+          >
             Semana
           </Button>
-          <Button variant="ghost" className="px-3 py-1 text-xs font-semibold rounded text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors h-auto">
+          <Button 
+            variant="ghost" 
+            onClick={() => setFilter("month")}
+            className={`px-3 py-1 text-xs font-semibold rounded h-auto transition-colors ${filter === "month" ? "bg-slate-100 dark:bg-slate-800" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`}
+          >
             Mes
           </Button>
         </div>

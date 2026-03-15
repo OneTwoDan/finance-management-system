@@ -1,14 +1,10 @@
 import { MetricCard } from "@/components/MetricCard";
-import { TrendBadge } from "@/components/TrendBadge";
-import { Progress } from "@/components/ui/progress";
 
 export interface ReportsSummaryCardsProps {
   currentBalance: number;
-  incomeThisMonth: number;
-  expensesThisMonth: number;
 }
 
-export function ReportsSummaryCards({ currentBalance, incomeThisMonth, expensesThisMonth }: ReportsSummaryCardsProps) {
+export function ReportsSummaryCards({ currentBalance }: ReportsSummaryCardsProps) {
   const formatMoney = (val: number) => `$${val.toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
 
   return (
@@ -19,34 +15,6 @@ export function ReportsSummaryCards({ currentBalance, incomeThisMonth, expensesT
         prominent
         icon="account_balance_wallet"
         className="md:col-span-1"
-        footer={
-          <div className="flex items-center gap-2">
-            <TrendBadge trend="up" value="+12.5%" />
-            <span className="text-xs text-slate-400">vs. mes anterior</span>
-          </div>
-        }
-      />
-
-      <MetricCard
-        title="Ingresos del Mes"
-        value={formatMoney(incomeThisMonth)}
-        footer={
-          <>
-            <Progress value={70} className="w-full h-1.5 [&>div]:bg-primary bg-slate-100 dark:bg-slate-800" />
-            <p className="text-[10px] text-slate-400 mt-2">70% de la meta mensual alcanzada</p>
-          </>
-        }
-      />
-
-      <MetricCard
-        title="Gastos Operativos"
-        value={formatMoney(expensesThisMonth)}
-        footer={
-          <div className="flex items-center gap-2">
-            <TrendBadge trend="flat" value="Estable" />
-            <span className="text-xs text-slate-400">Promedio diario: $428</span>
-          </div>
-        }
       />
     </div>
   );

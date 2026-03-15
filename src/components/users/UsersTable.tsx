@@ -12,10 +12,11 @@ import { User } from "@/types";
 
 export interface UsersTableProps {
   users: User[];
+  isLoading?: boolean;
   onUserUpdated?: (updatedUser: User) => void;
 }
 
-export function UsersTable({ users, onUserUpdated }: UsersTableProps) {
+export function UsersTable({ users, isLoading, onUserUpdated }: UsersTableProps) {
   // Helper to extract initials
   const getInitials = (name: string) => {
     return name.split(" ")
@@ -78,13 +79,22 @@ export function UsersTable({ users, onUserUpdated }: UsersTableProps) {
                 </TableCell>
               </TableRow>
             ))}
-            {users.length === 0 && (
+            {isLoading ? (
               <TableRow>
-                <TableCell colSpan={4} className="px-6 py-8 text-center text-slate-500">
+                <TableCell colSpan={5} className="px-6 py-8 text-center text-slate-500">
+                  <div className="flex flex-col items-center justify-center space-y-3">
+                    <span className="material-symbols-outlined animate-spin text-primary text-4xl">refresh</span>
+                    <p className="text-sm font-medium">Cargando usuarios...</p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : users.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="px-6 py-8 text-center text-slate-500">
                   No hay usuarios registrados.
                 </TableCell>
               </TableRow>
-            )}
+            ) : null}
           </TableBody>
         </Table>
       </div>

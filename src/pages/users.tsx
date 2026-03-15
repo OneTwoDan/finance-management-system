@@ -7,8 +7,10 @@ import { User } from "@/types";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchUsers = async ({ silent = false } = {}) => {
+    if (!silent) setIsLoading(true);
     try {
       const res = await fetch("/api/users");
       if (!res.ok) throw new Error("Failed to fetch");
@@ -16,6 +18,8 @@ export default function UsersPage() {
       setUsers(data);
     } catch (error) {
       console.error("Failed to fetch users", error);
+    } finally {
+      if (!silent) setIsLoading(false);
     }
   };
 
@@ -50,6 +54,7 @@ export default function UsersPage() {
         
         <UsersTable 
           users={users} 
+          isLoading={isLoading}
           onUserUpdated={handleUserUpdated} 
         />
       </div>

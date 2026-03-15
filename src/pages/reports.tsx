@@ -77,27 +77,26 @@ export default function ReportsPage() {
     }
   };
 
-  const headerActions = (
-    <button
-      onClick={handleDownloadCsv}
-      className="hidden sm:flex items-center gap-2 px-3 py-1.5 text-sm font-medium border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors ml-2"
-    >
-      <span className="material-symbols-outlined !text-lg">download</span>
-      Descargar CSV
-    </button>
-  );
-
   return (
-    <Layout headerActions={headerActions}>
+    <Layout>
       <div className="space-y-8">
         {/* Title & Actions */}
         <PageHeader
           title="Reportes y Estadísticas"
           description="Monitorea el flujo de caja y rendimiento financiero en tiempo real."
         >
-          <div className="flex items-center gap-2 text-sm text-slate-500 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800">
-            <span className="material-symbols-outlined !text-lg">calendar_today</span>
-            <span>Enero 2024 - Junio 2024</span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleDownloadCsv}
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 text-sm font-medium border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors bg-white dark:bg-slate-900 shadow-sm"
+            >
+              <span className="material-symbols-outlined !text-lg">download</span>
+              Descargar CSV
+            </button>
+            <div className="flex items-center gap-2 text-sm text-slate-500 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
+              <span className="material-symbols-outlined !text-lg">calendar_today</span>
+              <span>Enero 2024 - Junio 2024</span>
+            </div>
           </div>
         </PageHeader>
 

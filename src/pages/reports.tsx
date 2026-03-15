@@ -37,6 +37,7 @@ function LoadingSpinner() {
 export default function ReportsPage() {
   const [reportSummary, setReportSummary] = useState<ReportSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDownloadingCsv, setIsDownloadingCsv] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,7 +60,9 @@ export default function ReportsPage() {
 
 
   const handleDownloadCsv = async () => {
+    if (isDownloadingCsv) return;
     try {
+      setIsDownloadingCsv(true);
       const response = await fetch("/api/reports/csv");
       if (!response.ok) throw new Error("Failed to download CSV");
       const blob = await response.blob();
@@ -73,6 +76,8 @@ export default function ReportsPage() {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Failed to download CSV:", error);
+    } finally {
+      setIsDownloadingCsv(false);
     }
   };
 
@@ -87,10 +92,18 @@ export default function ReportsPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={handleDownloadCsv}
-              className="hidden sm:flex items-center gap-2 px-3 py-1.5 text-sm font-medium border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors bg-white dark:bg-slate-900 shadow-sm"
+              disabled={isDownloadingCsv}
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 text-sm font-medium border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors bg-white dark:bg-slate-900 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span className="material-symbols-outlined !text-lg">download</span>
-              Descargar CSV
+              {isDownloadingCsv ? (
+                <svg className="animate-spin h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+              ) : (
+                <span className="material-symbols-outlined !text-lg">download</span>
+              )}
+              {isDownloadingCsv ? "Descargando..." : "Descargar CSV"}
             </button>
           </div>
         </PageHeader>

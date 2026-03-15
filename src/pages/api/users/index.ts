@@ -36,7 +36,43 @@ import { rbac } from "@/utils/rbac";
  *                     type: string
  *                     example: 2023-01-01T00:00:00Z
  *       403:
- *         description: Forbidden.
+ *         description: Forbidden. Insufficient permissions.
+ *   post:
+ *     summary: Create a new user
+ *     description: Creates a new user in the system. Requires ADMIN role.
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - role
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: John Doe
+ *               email:
+ *                 type: string
+ *                 example: john@example.com
+ *               phone:
+ *                 type: string
+ *                 example: "+1234567890"
+ *               role:
+ *                 type: string
+ *                 example: USER
+ *     responses:
+ *       201:
+ *         description: User created successfully.
+ *       400:
+ *         description: Bad request. Missing required fields or email already in use.
+ *       403:
+ *         description: Forbidden. Insufficient permissions.
+ *       500:
+ *         description: Server error.
  */
 
 async function handler(

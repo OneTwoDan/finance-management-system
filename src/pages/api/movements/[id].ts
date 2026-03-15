@@ -3,6 +3,66 @@ import { MovementService } from "@/services/MovementService";
 import { requireAuth, AuthenticatedSession } from "@/utils/middleware";
 import { rbac } from "@/utils/rbac";
 
+/**
+ * @swagger
+ * /api/movements/{id}:
+ *   put:
+ *     summary: Update a movement
+ *     description: Modifies an existing movement. Requires ADMIN role.
+ *     tags: [Movements]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the movement to update.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               concept:
+ *                 type: string
+ *                 example: Pago de Servidor
+ *               amount:
+ *                 type: number
+ *                 example: -1200
+ *               date:
+ *                 type: string
+ *                 example: 2023-11-01
+ *     responses:
+ *       200:
+ *         description: Movement updated successfully.
+ *       400:
+ *         description: Invalid movement ID.
+ *       403:
+ *         description: Forbidden. Insufficient permissions.
+ *       500:
+ *         description: Server error.
+ *   delete:
+ *     summary: Delete a movement
+ *     description: Deletes an existing movement by ID. Requires ADMIN role.
+ *     tags: [Movements]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the movement to delete.
+ *     responses:
+ *       204:
+ *         description: Movement deleted successfully.
+ *       400:
+ *         description: Invalid movement ID.
+ *       403:
+ *         description: Forbidden. Insufficient permissions.
+ *       500:
+ *         description: Server error.
+ */
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse,

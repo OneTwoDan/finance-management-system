@@ -9,7 +9,7 @@ const SwaggerUI = dynamic<{ url: string }>(
 export default function ApiDocs() {
   return (
     <div style={{ padding: '20px' }}>
-      <SwaggerUI url="/api/docs" />
+      <SwaggerUI url="/api/swagger" />
     </div>
   );
 }

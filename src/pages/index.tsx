@@ -1,5 +1,3 @@
-// The middleware redirects "/" to /login or /home before this renders.
-// This component serves as a lightweight fallback.
 export default function RootPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">

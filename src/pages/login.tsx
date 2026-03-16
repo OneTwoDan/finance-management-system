@@ -7,7 +7,6 @@ export default function LoginPage() {
   const { data: session, isPending } = authClient.useSession();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  // If already logged in, redirect away from login page
   useEffect(() => {
     if (!isPending && session?.user) {
       router.replace("/home");
@@ -18,8 +17,6 @@ export default function LoginPage() {
     if (isLoggingIn) return;
     setIsLoggingIn(true);
     try {
-      // After GitHub OAuth, redirect to /home.
-      // Middleware will then send USER-role users to /movements automatically.
       await authClient.signIn.social({
         provider: "github",
         callbackURL: "/home",

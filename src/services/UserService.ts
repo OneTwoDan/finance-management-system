@@ -2,10 +2,6 @@ import { User, Role } from "@/types";
 import { UserRepository } from "@/repositories/UserRepository";
 
 export class UserService {
-  /**
-   * getUsers
-   * Returns a list of active users from the database
-   */
   static async getUsers(): Promise<User[]> {
     const users = await UserRepository.findAll();
     return users.map((user) => ({
@@ -16,10 +12,6 @@ export class UserService {
     })) as User[];
   }
 
-  /**
-   * updateUser
-   * Updates fields for an existing user in the database
-   */
   static async updateUser(
     id: string,
     updates: { name?: string; phone?: string; role?: Role; isActive?: boolean }
@@ -38,10 +30,6 @@ export class UserService {
     }
   }
 
-  /**
-   * createUser
-   * Creates a new user in the database
-   */
   static async createUser(
     data: { name: string; email: string; phone?: string; role?: Role }
   ): Promise<User | null> {
@@ -51,7 +39,7 @@ export class UserService {
         email: data.email,
         phone: data.phone || null,
         role: data.role || "USER",
-        emailVerified: true, // Since created by admin
+        emailVerified: true,
       });
       return {
         ...newUser,

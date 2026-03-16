@@ -76,7 +76,6 @@ async function handler(
   session: AuthenticatedSession
 ) {
   if (req.method === "GET") {
-    // GET /api/movements -> authenticated user (handled by requireAuth wrapper)
     try {
       const movements = await MovementService.getMovements();
       return res.status(200).json(movements);
@@ -86,7 +85,6 @@ async function handler(
   }
 
   if (req.method === "POST") {
-    // POST /api/movements -> ADMIN
     if (!rbac.requireAdmin(session)) {
       return res.status(403).json({ error: "Forbidden: insufficient permissions" });
     }
@@ -100,7 +98,6 @@ async function handler(
     }
   }
 
-  // Handle any other HTTP method
   res.setHeader("Allow", ["GET", "POST"]);
   return res.status(405).end(`Method ${req.method} Not Allowed`);
 }

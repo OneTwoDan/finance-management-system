@@ -74,7 +74,6 @@ async function handler(
     return res.status(400).json({ error: "Invalid movement id" });
   }
 
-  // Both PUT and DELETE require ADMIN
   if (!rbac.requireAdmin(session)) {
     console.warn(`[API] Access denied for user ${session.user.email}. Role: ${session.user.role}`);
     return res.status(403).json({ 
@@ -93,7 +92,7 @@ async function handler(
       return res.status(500).json({ 
         error: "Failed to update movement", 
         message: error.message,
-        code: error.code // Prisma error codes
+        code: error.code
       });
     }
   }

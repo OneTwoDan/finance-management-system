@@ -64,7 +64,6 @@ async function handler(
     }
   }
 
-  // Handle any other HTTP method
   res.setHeader("Allow", ["PATCH"]);
   return res.status(405).end(`Method ${req.method} Not Allowed`);
 }

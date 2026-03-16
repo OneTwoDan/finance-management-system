@@ -6,13 +6,10 @@ import { NewMovementDialog } from "@/components/movements/NewMovementDialog";
 import { PageHeader } from "@/components/PageHeader";
 import { Movement } from "@/types";
 
-// Module-level cache: persists across re-mounts (navigating away and back)
-// but is cleared on a hard refresh. Acts as a simple stale-while-revalidate store.
 let movementsCache: Movement[] | null = null;
 
 export default function MovementsPage() {
   const [movements, setMovements] = useState<Movement[]>(movementsCache ?? []);
-  // Only show the spinner when there is no cached data yet
   const [isLoading, setIsLoading] = useState(movementsCache === null);
 
   const fetchMovements = async ({ silent = false } = {}) => {
@@ -31,9 +28,7 @@ export default function MovementsPage() {
   };
 
   const handleMovementCreated = (optimistic: Movement) => {
-    // Show the new movement instantly (optimistic update)
     setMovements((prev) => [optimistic, ...prev]);
-    // Re-fetch silently in background to get real data (userName, id, etc.)
     fetchMovements({ silent: true });
   };
 
@@ -44,10 +39,8 @@ export default function MovementsPage() {
 
   useEffect(() => {
     if (movementsCache !== null) {
-      // Data already cached — refresh silently in background, no spinner
       fetchMovements({ silent: true });
     } else {
-      // First visit — fetch and show spinner
       fetchMovements();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -56,7 +49,6 @@ export default function MovementsPage() {
   return (
     <Layout>
       <div className="space-y-8">
-        {/* Page Title & CTA */}
         <PageHeader
           title="Movimientos Financieros"
           description="Administra tus flujos de caja de forma eficiente."
@@ -69,10 +61,8 @@ export default function MovementsPage() {
           </NewMovementDialog>
         </PageHeader>
 
-        {/* Summary Cards */}
         <MovementsSummary movements={movements} />
 
-        {/* Table Component */}
         <MovementsTable
           movements={movements}
           isLoading={isLoading}

@@ -43,8 +43,6 @@ export default function ReportsPage() {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        // Single request — movements are now included in the report summary
-        // response, so we avoid a second round-trip + auth session check.
         const res = await fetch("/api/reports");
         const data: ReportSummary = await res.json();
         setReportSummary(data);
@@ -84,7 +82,6 @@ export default function ReportsPage() {
   return (
     <Layout>
       <div className="space-y-8">
-        {/* Title & Actions */}
         <PageHeader
           title="Reportes y Estadísticas"
           description="Monitorea el flujo de caja y rendimiento financiero en tiempo real."

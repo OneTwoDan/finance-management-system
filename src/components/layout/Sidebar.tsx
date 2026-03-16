@@ -7,8 +7,6 @@ import { useRouter } from "next/router";
 
 type NavLink = { href: string; icon: string; label: string; roles?: string[] };
 
-// Each nav item can have an optional `roles` allowlist.
-// If omitted, the link is visible to all authenticated users.
 const NAV_LINKS: NavLink[] = [
   { href: "/movements", icon: "swap_horiz", label: "Movimientos"                   },
   { href: "/users",     icon: "group",      label: "Usuarios",    roles: ["ADMIN"] },
@@ -32,7 +30,6 @@ export function Sidebar() {
   const user = session?.user;
   const role = (user as any)?.role as string | undefined;
 
-  // Filter links the current user is allowed to see
   const visibleLinks = NAV_LINKS.filter(
     (link) => !link.roles || (role && link.roles.includes(role as "ADMIN"))
   );

@@ -37,7 +37,7 @@ Sigue estos pasos para configurar y ejecutar la aplicación en tu entorno local.
 ### 2. Clonar e Instalar Dependencias
 
 ```bash
-git clone <URL_DEL_REPOSITORIO>
+git clone <https://github.com/OneTwoDan/finance-management-system.git>
 cd finance-management-system
 npm install
 ```

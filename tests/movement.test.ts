@@ -1,75 +1,72 @@
-import { describe, it, expect } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from "vitest";
+import { MovementService } from "@/services/MovementService";
+import { MovementRepository } from "@/repositories/MovementRepository";
 
-/**
- * Validates movement creation input according to business rules.
- */
-interface MovementInput {
-  concept?: string;
-  amount?: number;
-  date?: string;
-}
+vi.mock("@/repositories/MovementRepository", () => ({
+  MovementRepository: {
+    create: vi.fn(),
+    findAll: vi.fn(),
+  },
+}));
 
-function validateMovement(input: MovementInput): { valid: boolean; errors: string[] } {
-  const errors: string[] = [];
-
-  // Concept is required and must not be empty
-  if (!input.concept || input.concept.trim() === '') {
-    errors.push('concept is required');
-  }
-
-  // Amount must be greater than 0
-  if (input.amount === undefined || input.amount === null) {
-    errors.push('amount is required');
-  } else if (input.amount === 0) {
-    errors.push('amount must not be zero');
-  }
-
-  // Date must be a valid date string
-  if (!input.date) {
-    errors.push('date is required');
-  } else {
-    const parsed = Date.parse(input.date);
-    if (isNaN(parsed)) {
-      errors.push('date must be a valid date');
-    }
-  }
-
-  return { valid: errors.length === 0, errors };
-}
-
-describe('Movement Creation Validation', () => {
-  it('should pass with valid data', () => {
-    const result = validateMovement({ concept: 'Pago', amount: 500, date: '2024-01-15' });
-    expect(result.valid).toBe(true);
-    expect(result.errors).toHaveLength(0);
+describe("MovementService Tests", () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
   });
 
-  it('should fail when concept is missing', () => {
-    const result = validateMovement({ concept: '', amount: 100, date: '2024-01-15' });
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContain('concept is required');
+  describe("createMovement", () => {
+    it("should successfully create a movement and map the dates to ISO string", async () => {
+      const mockDate = new Date("2024-01-15T12:00:00.000Z");
+      vi.mocked(MovementRepository.create).mockResolvedValue({
+        id: "new-1",
+        concept: "Pago de servicio",
+        amount: 500,
+        date: mockDate,
+        userId: "user-1",
+        createdAt: mockDate,
+      } as any);
+
+      const result = await MovementService.createMovement({
+        concept: "Pago de servicio",
+        amount: 500,
+        date: "2024-01-15T12:00:00.000Z",
+        userId: "user-1",
+      });
+
+      expect(MovementRepository.create).toHaveBeenCalledWith({
+        concept: "Pago de servicio",
+        amount: 500,
+        date: new Date("2024-01-15T12:00:00.000Z"),
+        userId: "user-1",
+      });
+      
+      expect(result.id).toBe("new-1");
+      expect(result.date).toBe(mockDate.toISOString());
+      expect(result.createdAt).toBe(mockDate.toISOString());
+    });
   });
 
-  it('should fail when amount is zero', () => {
-    const result = validateMovement({ concept: 'Test', amount: 0, date: '2024-01-15' });
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContain('amount must not be zero');
-  });
+  describe("getMovements", () => {
+    it("should correctly fetch movements and map the username properly", async () => {
+      const mockDate = new Date("2024-01-15T12:00:00.000Z");
+      vi.mocked(MovementRepository.findAll).mockResolvedValue([
+        {
+          id: "mov-1",
+          concept: "Salario",
+          amount: 2000,
+          date: mockDate,
+          userId: "user-1",
+          createdAt: mockDate,
+          user: { name: "Admin User", id: "user-1" },
+        },
+      ] as any);
 
-  it('should fail when date is invalid', () => {
-    const result = validateMovement({ concept: 'Test', amount: 100, date: 'not-a-date' });
-    expect(result.valid).toBe(false);
-    expect(result.errors).toContain('date must be a valid date');
-  });
+      const movements = await MovementService.getMovements();
 
-  it('should fail when multiple fields are missing', () => {
-    const result = validateMovement({});
-    expect(result.valid).toBe(false);
-    expect(result.errors.length).toBeGreaterThan(1);
-  });
-
-  it('should accept negative amounts (expenses)', () => {
-    const result = validateMovement({ concept: 'Alquiler', amount: -1200, date: '2024-01-10' });
-    expect(result.valid).toBe(true);
+      expect(MovementRepository.findAll).toHaveBeenCalledOnce();
+      expect(movements).toHaveLength(1);
+      expect(movements[0].userName).toBe("Admin User");
+      expect(movements[0].date).toBe(mockDate.toISOString());
+    });
   });
 });
